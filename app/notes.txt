@@ -1,0 +1,10 @@
+--Add library
+
+To reference an external lib project without copy, just do this: - Insert this 2 lines on setting.gradle:
+
+  include ':your-lib-name'
+  project(':your-lib-name').projectDir = new File('/path-to-your-lib/your-lib-name)
+Insert this line on on dependencies part of build.gradle file:
+
+compile project(':your-lib-name')
+Sync project

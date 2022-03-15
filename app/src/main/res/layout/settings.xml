@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <TextView
+        android:id="@+id/setting_title_tv"
+        android:text="App wide settings and Utilities"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Space
+        android:id="@+id/settings_space1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        app:layout_constraintTop_toBottomOf="@+id/setting_title_tv"
+         />
+
+    <TextView
+        android:id="@+id/setting_colorscheme_textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Color scheme:"
+        android:layout_margin="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/settings_space1"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <Spinner
+        android:id="@+id/setting_colorscheme_spinner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/settings_space1"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <Space
+        android:id="@+id/settings_space2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/setting_colorscheme_spinner"
+        />
+
+    <TextView
+        android:id="@+id/settings_utility_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Utilities"
+        android:layout_margin="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_space2"/>
+
+    <Space
+        android:id="@+id/settings_space3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:layout_constraintTop_toBottomOf="@+id/settings_utility_title"
+        />
+
+    <TextView
+        android:id="@+id/settings_channremake_textview"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="remake chann"
+        android:layout_margin="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_space3"/>
+
+    <Button
+        android:id="@+id/settings_fixchannel_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="remake"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/settings_space3"/>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

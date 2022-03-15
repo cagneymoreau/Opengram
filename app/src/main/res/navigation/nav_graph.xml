@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/load_Fragment">
+
+    <!-- Loading or one time login fragments -->
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.cagneymoreau.teletest.ui.login.LoginFragment"
+        android:label="LoginFragment"
+        tools:layout="@layout/login_fragment">
+        <action
+            android:id="@+id/action_loginFragment_to_chatList"
+            app:destination="@id/chatList"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true"/>
+    </fragment>
+    <action
+        android:id="@+id/action_global_loginFragment"
+        app:destination="@id/loginFragment"/>
+
+
+    <fragment
+        android:id="@+id/load_Fragment"
+        android:name="com.cagneymoreau.teletest.ui.misc.LoadFragment"
+        android:label="LoadFragment"
+        tools:layout="@layout/load_fragment">
+        <action
+            android:id="@+id/action_load_Fragment_to_chatList"
+            app:destination="@id/chatList"
+            app:popUpTo="@id/load_Fragment"
+            app:popUpToInclusive="true"/>
+        <action
+            android:id="@+id/action_load_Fragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/load_Fragment"
+            app:popUpToInclusive="true"/>
+    </fragment>
+
+    <!--  main menu fragments  -->
+
+    <fragment
+        android:id="@+id/chatList"
+        android:name="com.cagneymoreau.teletest.ui.chatlist.ChatList"
+        android:label="ChatList"
+        tools:layout="@layout/chatlist_fragment"/>
+    <action
+        android:id="@+id/action_global_chatList"
+        app:destination="@id/chatList"
+        app:popUpToInclusive="true"/>
+
+    <fragment
+        android:id="@+id/marketer"
+        android:name="com.cagneymoreau.teletest.ui.market.Market"
+        android:label="MarketFragment"
+        tools:layout="@layout/market_fragment"/>
+    <action
+        android:id="@+id/market"
+        app:destination="@id/marketer" />
+
+    <fragment
+        android:id="@+id/postChooserer"
+        android:name="com.cagneymoreau.teletest.ui.posting.PostChooser"
+        android:label="PostChooser" />
+    <action
+        android:id="@+id/postChooser"
+        app:destination="@id/postChooserer"
+        />
+    <fragment
+        android:id="@+id/groupProjecter"
+        android:name="com.cagneymoreau.teletest.ui.groupproj.GroupProject"
+        android:label="GroupProject" />
+    <action
+        android:id="@+id/groupProject"
+        app:destination="@id/groupProjecter"
+        />
+    <fragment
+        android:id="@+id/toDoLister"
+        android:name="com.cagneymoreau.teletest.ui.todo.ToDoList"
+        android:label="ToDoList" />
+    <action
+        android:id="@+id/todoList"
+        app:destination="@id/toDoLister"
+        />
+
+    <fragment
+        android:id="@+id/settingser"
+        android:name="com.cagneymoreau.teletest.ui.misc.Settings"
+        android:label="Settings" />
+    <action
+        android:id="@+id/settings"
+        app:destination="@id/settingser"
+        app:popUpTo="@layout/app_bar_main"
+        app:popUpToInclusive="true"/>
+
+    <fragment
+        android:id="@+id/abouter"
+        android:name="com.cagneymoreau.teletest.ui.misc.About"
+        android:label="AboutFragment" />
+    <action
+        android:id="@+id/about"
+        app:destination="@id/abouter"
+        app:popUpTo="@layout/app_bar_main"
+        app:popUpToInclusive="true"/>
+
+    <fragment
+        android:id="@+id/update"
+        android:name="com.cagneymoreau.teletest.ui.misc.InstallNewApk"
+        android:label="Update" />
+    <action android:id="@+id/action_global_update" app:destination="@id/update"/>
+
+
+    <!-- Fragments below Main Menu Tier  -->
+
+    <fragment
+        android:id="@+id/posting_Fragment"
+        android:name="com.cagneymoreau.teletest.ui.posting.Posting"
+        android:label="posting fragment" /><action android:id="@+id/action_global_posting_Fragment" app:destination="@id/posting_Fragment"/>
+
+
+    <fragment
+        android:id="@+id/simpleChat"
+        android:name="com.cagneymoreau.teletest.ui.chat.SimpleChat"
+        android:label="SimpleChat" /><action android:id="@+id/action_global_simpleChat" app:destination="@id/simpleChat"/>
+    <fragment
+        android:id="@+id/postViewer"
+        android:name="com.cagneymoreau.teletest.ui.market.PostViewer"
+        android:label="PostViewer" />
+    <action android:id="@+id/action_global_postViewer" app:destination="@id/postViewer" />
+    <fragment
+        android:id="@+id/imageFull"
+        android:name="com.cagneymoreau.teletest.ui.misc.ImageFull"
+        android:label="ImageFull" /><action android:id="@+id/action_global_imageFull" app:destination="@id/imageFull"/>
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.cagneymoreau.teletest.MainActivity"
+        android:label="app_bar_main"
+        tools:layout="@layout/app_bar_main" />
+
+
+
+</navigation>

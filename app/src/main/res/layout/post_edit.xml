@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/post_edit_title_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Posting Title"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <EditText
+                android:id="@+id/post_edit_title_editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="shortest description possible"
+                app:layout_constraintTop_toBottomOf="@+id/post_edit_title_textview"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/post_edit_desc_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Posting Description"
+                app:layout_constraintTop_toBottomOf="@+id/post_edit_title_editText"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <EditText
+                android:id="@+id/post_edit_desc_editText"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:hint="Describe the Details"
+                android:inputType="textMultiLine"
+                app:layout_constraintTop_toBottomOf="@+id/post_edit_desc_textview"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <TextView
+                android:id="@+id/post_edit_price_textview"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Price"
+                app:layout_constraintTop_toBottomOf="@+id/post_edit_desc_editText"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <EditText
+                android:id="@+id/post_edit_price_editText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Describe the Details"
+                android:inputType="textMultiLine"
+                app:layout_constraintTop_toBottomOf="@+id/post_edit_price_textview"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <androidx.appcompat.widget.SwitchCompat
+                android:text="Event with Date"
+                android:id="@+id/post_edit_marketorevent_switch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/post_edit_price_editText"
+                app:layout_constraintStart_toStartOf="parent"/>
+
+            <Spinner
+                android:id="@+id/posting_category_spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/post_edit_marketorevent_switch"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/post_edit_price_editText"/>
+
+
+            <HorizontalScrollView
+                android:id="@+id/post_edit_images_scrollview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/post_edit_marketorevent_switch"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                >
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/post_edit_images_layout"
+                    android:orientation="horizontal"
+                    android:layout_gravity="left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:id="@+id/post_edit_adder_imageview"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        />
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+            </HorizontalScrollView>
+
+            <ScrollView
+                android:id="@+id/post_edit_chats_scrollview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/post_edit_images_scrollview"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                >
+                <androidx.appcompat.widget.LinearLayoutCompat
+                    android:id="@+id/post_edit_chats_layout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:id="@+id/post_edit_chats_textview"
+                        android:text="You must add some chats"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"/>
+
+                    <!-- Add chat ident cards here -->
+
+                </androidx.appcompat.widget.LinearLayoutCompat>
+
+            </ScrollView>
+
+
+            <Button
+                android:id="@+id/post_edit_update_button"
+                android:text="create"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/post_edit_chats_scrollview"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/post_edit_delete_button"/>
+            <Button
+                android:id="@+id/post_edit_delete_button"
+                android:text="delete"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/post_edit_chats_scrollview"
+                app:layout_constraintStart_toEndOf="@+id/post_edit_update_button"
+                app:layout_constraintEnd_toEndOf="parent"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </ScrollView>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

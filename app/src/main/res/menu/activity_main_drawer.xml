@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group
+        android:id="@+id/menu_group"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/chatList"
+            android:title= "ChatList"
+            android:icon="@drawable/ic_baseline_chat_24"
+            tools:layout="@layout/chatlist_fragment"
+            />
+        <item
+            android:id="@+id/market"
+            android:icon="@drawable/ic_baseline_shopping_cart_24"
+            android:title="Market" />
+        <item
+            android:id="@+id/postChooser"
+            android:icon="@drawable/ic_baseline_attach_money_24"
+            android:title="My Posts" />
+        <item
+            android:id="@+id/todoList"
+            android:icon="@drawable/ic_baseline_checklist_rtl_24"
+            android:title="TODO List" />
+        <!--
+        <item
+            android:id="@+id/groupProject"
+            android:icon="@drawable/ic_baseline_folder_shared_24"
+            android:title="Group Project" />
+            -->
+        <item
+            android:id="@+id/settings"
+            android:icon="@drawable/ic_baseline_settings_24"
+            android:title="Settings" />
+        <item
+            android:id="@+id/about"
+            android:icon="@drawable/ic_baseline_emoji_people_24"
+            android:title="About" />
+
+
+    </group>
+
+
+</menu>

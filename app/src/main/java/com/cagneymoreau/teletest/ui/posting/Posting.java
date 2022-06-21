@@ -581,6 +581,9 @@ public class Posting extends Fragment implements DatePickerDialog.OnDateSetListe
 
     //region -------- event
 
+
+
+
     @Override
     public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
         year = i;
@@ -616,5 +619,12 @@ public class Posting extends Fragment implements DatePickerDialog.OnDateSetListe
         
     }
     
+
+
+
     //endregion
+
+
+
+
 }

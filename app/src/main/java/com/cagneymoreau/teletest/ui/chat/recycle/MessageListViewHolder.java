@@ -34,7 +34,7 @@ import com.cagneymoreau.teletest.MainActivity;
 import com.cagneymoreau.teletest.MessageListCallback;
 import com.cagneymoreau.teletest.R;
 import com.cagneymoreau.teletest.Utilities;
-import com.cagneymoreau.teletest.data.Image;
+
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;

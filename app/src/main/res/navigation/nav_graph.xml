@@ -53,40 +53,6 @@
         app:popUpToInclusive="true"/>
 
     <fragment
-        android:id="@+id/marketer"
-        android:name="com.cagneymoreau.teletest.ui.market.Market"
-        android:label="MarketFragment"
-        tools:layout="@layout/market_fragment"/>
-    <action
-        android:id="@+id/market"
-        app:destination="@id/marketer" />
-
-    <fragment
-        android:id="@+id/postChooserer"
-        android:name="com.cagneymoreau.teletest.ui.posting.PostChooser"
-        android:label="PostChooser" />
-    <action
-        android:id="@+id/postChooser"
-        app:destination="@id/postChooserer"
-        />
-    <fragment
-        android:id="@+id/groupProjecter"
-        android:name="com.cagneymoreau.teletest.ui.groupproj.GroupProject"
-        android:label="GroupProject" />
-    <action
-        android:id="@+id/groupProject"
-        app:destination="@id/groupProjecter"
-        />
-    <fragment
-        android:id="@+id/toDoLister"
-        android:name="com.cagneymoreau.teletest.ui.todo.ToDoList"
-        android:label="ToDoList" />
-    <action
-        android:id="@+id/todoList"
-        app:destination="@id/toDoLister"
-        />
-
-    <fragment
         android:id="@+id/settingser"
         android:name="com.cagneymoreau.teletest.ui.misc.Settings"
         android:label="Settings" />
@@ -112,24 +78,20 @@
         android:label="Update" />
     <action android:id="@+id/action_global_update" app:destination="@id/update"/>
 
+    <fragment
+        android:id="@+id/newGroup"
+        android:name="com.cagneymoreau.teletest.ui.newgroup.NewGroup"
+        android:label="NewGroup" />
+    <action android:id="@+id/action_global_nameGroup" app:destination="@id/nameGroup"/><action android:id="@+id/action_global_newGroup" app:destination="@id/newGroup"/>
+
 
     <!-- Fragments below Main Menu Tier  -->
-
-    <fragment
-        android:id="@+id/posting_Fragment"
-        android:name="com.cagneymoreau.teletest.ui.posting.Posting"
-        android:label="posting fragment" /><action android:id="@+id/action_global_posting_Fragment" app:destination="@id/posting_Fragment"/>
 
 
     <fragment
         android:id="@+id/simpleChat"
         android:name="com.cagneymoreau.teletest.ui.chat.SimpleChat"
         android:label="SimpleChat" /><action android:id="@+id/action_global_simpleChat" app:destination="@id/simpleChat"/>
-    <fragment
-        android:id="@+id/postViewer"
-        android:name="com.cagneymoreau.teletest.ui.market.PostViewer"
-        android:label="PostViewer" />
-    <action android:id="@+id/action_global_postViewer" app:destination="@id/postViewer" />
     <fragment
         android:id="@+id/imageFull"
         android:name="com.cagneymoreau.teletest.ui.misc.ImageFull"
@@ -139,7 +101,15 @@
         android:name="com.cagneymoreau.teletest.MainActivity"
         android:label="app_bar_main"
         tools:layout="@layout/app_bar_main" />
-
+    <fragment
+        android:id="@+id/nameGroup"
+        android:name="com.cagneymoreau.teletest.ui.newgroup.NameGroup"
+        android:label="NameGroup" />
+    <fragment
+        android:id="@+id/contacts"
+        android:name="com.cagneymoreau.teletest.ui.contacts.Contacts"
+        android:label="Contacts" />
+    <action android:id="@+id/action_global_contacts2" app:destination="@id/contacts"/>
 
 
 </navigation>

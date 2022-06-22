@@ -1,19 +1,11 @@
 package com.cagneymoreau.teletest.ui.chatlist;
 
 import android.os.Bundle;
-import android.telephony.PhoneNumberFormattingTextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.SearchView;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -29,21 +21,14 @@ import com.cagneymoreau.teletest.MainActivity;
 import com.cagneymoreau.teletest.Paywall;
 import com.cagneymoreau.teletest.R;
 import com.cagneymoreau.teletest.RecyclerTouchListener;
-import com.cagneymoreau.teletest.data.MarketController;
-import com.cagneymoreau.teletest.ui.Information_Dialog;
+import com.cagneymoreau.teletest.data.Controller;
 import com.cagneymoreau.teletest.ui.chatlist.recycle.ChatListAdapter;
-import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.util.ArrayList;
-import java.util.NavigableSet;
-import java.util.TreeSet;
-import java.util.concurrent.ConcurrentMap;
-
-
 
 
 /**
@@ -62,7 +47,7 @@ public class ChatList extends Fragment  implements SearchView.OnQueryTextListene
     RecyclerView.LayoutManager layoutManager;
     ChatListAdapter chatlistAdapter;
 
-    MarketController marketController;
+    Controller controller;
 
     DialogSender thisChat = this;
 
@@ -87,11 +72,9 @@ public class ChatList extends Fragment  implements SearchView.OnQueryTextListene
 
         ((MainActivity)getActivity()).getSupportActionBar().setTitle(getActivity().getResources().getString(R.string.app_name));
 
-        marketController = MarketController.getInstance((MainActivity) getActivity());
+        controller = Controller.getInstance((MainActivity) getActivity());
 
         paywall = new Paywall(((MainActivity) getActivity()));
-
-
 
         return fragment;
 
@@ -110,7 +93,7 @@ public class ChatList extends Fragment  implements SearchView.OnQueryTextListene
         buildTabs();
         buildFrag();
         ((MainActivity)getActivity()).setQueryListener(this);
-        if (paywall.shouldAnnoyUser()) paywall.displayAnnoyingPopUp(this);
+
     }
 
 
@@ -199,22 +182,7 @@ public class ChatList extends Fragment  implements SearchView.OnQueryTextListene
             @Override
             public void onLongClick(View view, int position, float x, float y) {
 
-                //check if can post
-                TdApi.Chat choseChat = chatlistAdapter.getChat(position);
-                if (choseChat.type.getConstructor() ==  TdApi.ChatTypeSupergroup.CONSTRUCTOR ) {
-                    TdApi.ChatTypeSupergroup group = (TdApi.ChatTypeSupergroup) choseChat.type;
-                    if (group.isChannel) {
-                        Toast.makeText(getContext(), "You can't post to this group", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                }
-                //open dialog to confirm
-                    if (marketController.isMarketAlready(choseChat.id)){
-                        new Information_Dialog("Remove this chat from your marketplace?", thisChat, choseChat, -1, position).show(getChildFragmentManager(), "info dialog");
 
-                    }else{
-                        new Information_Dialog("Use this chat as a marketplace?", thisChat, choseChat, 1, position).show(getChildFragmentManager(), "info dialog");
-                    }
 
             }
         }));
@@ -306,20 +274,12 @@ public class ChatList extends Fragment  implements SearchView.OnQueryTextListene
     @Override
     public void setvalue(int i, TdApi.Chat c, int position) {
 
-        if (i == 1){
-            marketController.addChat(c.id);
-            chatlistAdapter.notifyItemChanged(position);
-        }else if (i == -1){
-            marketController.deleteChat(c.id);
-            chatlistAdapter.notifyItemChanged(position);
-        }
-
     }
 
     //lets list attach to our adapter
-    public MarketController getMarketController()
+    public Controller getMarketController()
     {
-        return marketController;
+        return controller;
     }
 
 }

@@ -1,5 +1,4 @@
 # teletest
 
-Project Description:
-This is a full ui buildout using the telegram api for android. 
+This project is to create a super simple vanilla messaging and telephone app using the telegram api
 

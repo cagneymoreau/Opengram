@@ -16,7 +16,7 @@ import androidx.fragment.app.Fragment;
 import com.cagneymoreau.teletest.MainActivity;
 import com.cagneymoreau.teletest.R;
 import com.cagneymoreau.teletest.Utilities;
-import com.cagneymoreau.teletest.data.Image;
+
 
 import org.drinkless.td.libcore.telegram.TdApi;
 

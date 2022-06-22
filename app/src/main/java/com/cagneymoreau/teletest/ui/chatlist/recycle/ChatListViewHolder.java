@@ -104,12 +104,7 @@ class ChatListViewHolder extends RecyclerView.ViewHolder {
             postPreview(chat.lastMessage);
         }
 
-        if (chatList.getMarketController().isMarketAlready(chat.id)){
-            checkImageView.setVisibility(View.VISIBLE);
-            checkImageView.setImageResource(R.drawable.ic_baseline_check_circle_24);
-        }else{
-            checkImageView.setVisibility(View.INVISIBLE);
-        }
+
 
 
     }

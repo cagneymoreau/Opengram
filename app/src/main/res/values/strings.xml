@@ -8,6 +8,7 @@
     <string name="message_text">Telemarket Post</string>
     <string name="app_intent"> I designed this app to allow people to better manage their local groups bartering and event planning. You can contact me at @robo_cam on telegram or visit the telegram channel telemarket_buysell for more information.</string>
     <string name="privacy_policy">My normal privacy policy explains tha I have no intention of harvesting or collecting your data but that I can\'t guarantee it\'s security. I think that this is still true with this app. I really like telegram and recommend it to everyone. But in my personal opinion you can\' rely on privacy when using a computer. If your worried about my app vs telegram itself then please feel free to browse github and search cagney moreau to view the code with a brief explanation of how it works. </string>
-
+    <string name="contacts_title">Contacts</string>
+    <string name="submit">Submit</string>
 
 </resources>

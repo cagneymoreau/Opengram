@@ -132,6 +132,13 @@ public class Utilities {
 
     }
 
+    public static void setUserAvater(TdApi.UserFullInfo user, ImageView imageView, MainActivity mainActivity)
+    {
+
+
+
+    }
+
 
     private static void displayFile(MainActivity mainActivity, ImageView imageView, File f, Bitmap b)
     {

@@ -21,10 +21,13 @@
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/activity_main.xml" value="0.33" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/advert_card_layout.xml" value="0.25" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/app_bar_main.xml" value="0.26358695652173914" />
+        <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/calllog_card.xml" value="0.21510416666666668" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/channels_card.xml" value="0.3532608695652174" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/chatlist_card.xml" value="0.3546875" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/chatlist_fragment.xml" value="0.19739583333333333" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/chatmessage_card.xml" value="0.5" />
+        <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/contacts_card.xml" value="0.21510416666666668" />
+        <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/contacts_fragment.xml" value="0.21510416666666668" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/content_main.xml" value="0.25" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/grid_layout.xml" value="0.3546875" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/grid_selectors_layout.xml" value="0.3546875" />
@@ -36,7 +39,9 @@
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/login_fragment.xml" value="0.19739583333333333" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/market_fragment.xml" value="0.3532608695652174" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/market_spinner_item.xml" value="0.2671875" />
+        <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/name_group_fragment.xml" value="0.21510416666666668" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/nav_header_main.xml" value="0.3546875" />
+        <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/newgroup_fragment.xml" value="0.21510416666666668" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/post_edit.xml" value="0.1875" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/post_viewer.xml" value="0.32155797101449274" />
         <entry key="..\:/Dropbox/Apps/AndroidStudioProjects/teletest/app/src/main/res/layout/posting.xml" value="0.3546875" />

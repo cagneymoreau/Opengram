@@ -1,7 +1,5 @@
 package com.cagneymoreau.teletest;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
@@ -12,11 +10,9 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.SortedList;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -26,21 +22,16 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cagneymoreau.teletest.data.MarketController;
+import com.cagneymoreau.teletest.data.Controller;
 import com.cagneymoreau.teletest.databinding.ActivityMainBinding;
 import com.cagneymoreau.teletest.ui.login.LoginFragment;
-import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.FirebaseApp;
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Properties;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -56,6 +47,11 @@ import java.util.concurrent.ConcurrentMap;
 
 //basic app function
 
+    //!! scan through app and get polished with current mvp messagin features
+
+// FUTUREITEM: normal telegram features in order of importance, calls leave join, open chat to last position
+
+
 
 // FIXME: 2/25/2022 appears channs are doubling with new layout
 
@@ -63,10 +59,11 @@ import java.util.concurrent.ConcurrentMap;
 // TODO: 2/14/2022 need to pass timestamp to download calls so setimageview can compare timestamps in race conditions in local vs download
 // TODO: 2/15/2022 even better use a simple unlock in onbind and a lock on the return of a value to lock out delayed race
 
-// FIXME: 2/11/2022 when app firt loads channel images are missing as well as user
+// FIXME: 2/11/2022 when app first loads channel images are missing as well as user
 
 // FIXME: 2/7/2022 download file method is not using unique id and may produce incorrect reults
 
+// FIXME: 6/22/2022 the sortedlists change range does not work
 
 // TODO: 2/25/2022 simplechat menu options,
 //  layout and aimated stickers
@@ -87,43 +84,7 @@ import java.util.concurrent.ConcurrentMap;
 //market
 
 
-//mypostings
 
-
-//post viewer
-    //other big ideas
-
-// FUTUREITEM: file share display
-// FUTUREITEM: profile groupchat availability or group event poll
-// FUTUREITEM: channel and private splitter
-// FUTUREITEM: send invoice cash or crypto
-
-    //market
-    // FUTUREITEM: prevent file spoof
-    // FUTUREITEM: delete picture from channel after deleting from add
-    // FUTUREITEM: missing micture looks like add picture
-// FUTUREITEM: reduce heap size for found adverts to 1kb by replacing images meesagephoto with a remote and local id
-// FUTUREITEM: macro for posting all add to new channels thathave been added
-// FUTUREITEM: scroll lock on chats for exit content and last seen positioning  
-// FUTUREITEM: join and leave chat
-// FUTUREITEM: show date on chatlist if over n days
-// FUTUREITEM: cant search people who havent been contacted in main bar search
-// FUTUREITEM: user profile view
-// FUTUREITEM: image quality from downloads
-// FUTUREITEM: individual profile
-// FUTUREITEM: normal telegram features, calls leave join, open chat to last position
-// FUTUREITEM: sticker maker
-
-// FUTUREITEM: map view
-// FUTUREITEM: post should include caption to download telemarket
-// FUTUREITEM: auto add channels where store use detected
-// FUTUREITEM: forwarding of events, add to calendar
-// FUTUREITEM: chatlist search could be better
-// FUTUREITEM: paymnt mechanism - need bot to charge the person
-// FUTUREITEM: search shows new people and channels
-// FUTUREITEM: dual lists - auto dual
-// FUTUREITEM: settings menu: appearance, autoexpire date (min 3 months)
-// FUTUREITEM: across device uniformity needed by saving to telegram api
 
 public class MainActivity extends AppCompatActivity implements Client.ResultHandler, Client.ExceptionHandler {
 
@@ -172,7 +133,7 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
     long delay = 500;
     boolean currentlyProcessing = false;
 
-    MarketController marketController;
+    Controller controller;
 
     int target = -1;
     int actual = -1;
@@ -235,11 +196,9 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         mAppBarConfiguration = new AppBarConfiguration.Builder(
+                R.id.newGroup,
+                R.id.contacts,
                 R.id.chatList,
-                R.id.market,
-                R.id.postChooser,
-                R.id.todoList,
-                //R.id.groupProject,
                 R.id.settings,
                 R.id.about)
                 .setOpenableLayout(drawer)
@@ -260,7 +219,7 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
     @Override
     protected void onPause() {
         super.onPause();
-        if (marketController != null) marketController.onPause();
+        if (controller != null) controller.onPause();
     }
 
     @Override
@@ -278,7 +237,7 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
             telegramClient = null;
         }
 
-        if (marketController != null) marketController.onPause();
+        if (controller != null) controller.onPause();
 
     }
 
@@ -313,6 +272,8 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
         }
 
     }
+
+    // TODO: 6/22/2022 remove querylistener
 
 
     /**
@@ -362,7 +323,7 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
                 }else{
 
                         whoAmI();
-                        marketController = MarketController.getInstance(activity);
+                        controller = Controller.getInstance(activity);
                         Update.findUpdatedApk(activity);
                         //open main chat list
 
@@ -452,7 +413,9 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
                 TdApi.UpdateSecretChat updateSecretChat = (TdApi.UpdateSecretChat) object;
                 secretChats.put(updateSecretChat.secretChat.id, updateSecretChat.secretChat);
                 //Log.e(TAG, "onResult: secretChat" + updateSecretChat.secretChat.toString(),  null);
+
                 break;
+
 
 
             case TdApi.UpdateNewChat.CONSTRUCTOR: {
@@ -471,7 +434,7 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
                     if (groupUpgradeTable.containsKey(supergroup.supergroupId)) {
 
                         long basicgroupid = groupUpgradeTable.get(supergroup.supergroupId);
-                        marketController.checkForUpgrade(basicgroupid, supergroup.supergroupId);
+                        controller.checkForUpgrade(basicgroupid, supergroup.supergroupId);
                         TdApi.Chat c = chatsUnsorted.remove(basicgroupid);
                         if (c != null) {
                             //easyChatList.remove(c);
@@ -528,7 +491,7 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
 
 
                //check if this message need processing
-                if (marketController != null && updateChat.lastMessage != null) marketController.unkownLastMessageSorter(updateChat.lastMessage);
+                if (controller != null && updateChat.lastMessage != null) controller.unkownLastMessageSorter(updateChat.lastMessage);
 
                 foundchat.lastMessage = updateChat.lastMessage;
 
@@ -728,6 +691,16 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
             case TdApi.Ok.CONSTRUCTOR:
                 //Log.e(TAG, "onResult: ok \n");
                 break;
+
+
+            case TdApi.UpdateCall.CONSTRUCTOR:
+                TdApi.UpdateCall updateCall = (TdApi.UpdateCall) object;
+
+                break;
+
+
+
+
             default:
                 //Log.e(TAG, "onResult: default \n" + object.toString());
 
@@ -740,15 +713,22 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
     @Override
     public void onResult(TdApi.Object object) {
 
-
+        
         if (object.getConstructor() == TdApi.UpdateAuthorizationState.CONSTRUCTOR){
                 onAuthorizationStateUpdate(object);
-        }else{
+        }
+        //telephone data (must be lightening fast
+        else if (object.getConstructor() == TdApi.UpdateNewCallSignalingData.CONSTRUCTOR)
+        {
+            // TODO: 6/21/2022
+        } 
+        //message data
+        else{
             batchBuilder.add(object);
         }
 
         //onuithreadmethod
-        if (marketController == null) return;
+        if (controller == null) return;
 
         if ( !currentlyProcessing && System.currentTimeMillis() > (lastBatch + delay)) {
 
@@ -809,8 +789,8 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
                 parameters.databaseDirectory = dbDir;
                 parameters.filesDirectory = filDir;
                 try {
-                    parameters.apiId = Integer.valueOf(Utilities.getProperty("api_id", this));
-                    parameters.apiHash = Utilities.getProperty("api_hash", this);
+                    parameters.apiId = 9885367; // Integer.valueOf(Utilities.getProperty("api_id", this));
+                    parameters.apiHash = "91e4215dc7a35faf0881579226f49653"; // Utilities.getProperty("api_hash", this);
                 }catch (Exception e)
                 {
                     Log.e(TAG, "onAuthorizationStateUpdate: ", e);
@@ -856,8 +836,6 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
 
             case TdApi.AuthorizationStateWaitCode.CONSTRUCTOR:
                 start(haveAuthorization);
-
-
 
                 Log.d(TAG, "onAuthorizationStateUpdate: "); //// TODO: 12/23/2021 remove me/
                 break;
@@ -967,6 +945,15 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
 
     }
 
+    public ConcurrentMap<Long, TdApi.UserFullInfo> getUsersList()
+    {
+        return usersFullInfo;
+    }
+
+    public ConcurrentMap<Long, TdApi.User> getUsers()
+    {
+        return users;
+    }
 
     public SortedList<TdApi.Chat> getEasyChats()
     {
@@ -1012,7 +999,11 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
 
             @Override
             public void onChanged(int position, int count) {
-                if (adapter != null) adapter.notifyItemRangeChanged(position, count);
+                if (adapter != null)
+                {
+                    //adapter.notifyItemRangeChanged(position, count);
+                    adapter.notifyDataSetChanged();
+                }
 
             }
 
@@ -1029,17 +1020,29 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
 
             @Override
             public void onInserted(int position, int count) {
-                if (adapter != null) adapter.notifyItemRangeInserted(position, count);
+                if (adapter != null)
+                {
+                    //adapter.notifyItemRangeInserted(position, count);
+                    adapter.notifyDataSetChanged();
+                }
             }
 
             @Override
             public void onRemoved(int position, int count) {
-                if (adapter != null) adapter.notifyItemRangeRemoved(position, count);
+                if (adapter != null)
+                {
+                    //adapter.notifyItemRangeRemoved(position, count);
+                    adapter.notifyDataSetChanged();
+                }
             }
 
             @Override
             public void onMoved(int fromPosition, int toPosition) {
-                if (adapter != null) adapter.notifyItemMoved(fromPosition, toPosition);
+                if (adapter != null)
+                {
+                    //adapter.notifyItemMoved(fromPosition, toPosition);
+                    adapter.notifyDataSetChanged();
+                }
             }
         });
     }
@@ -1396,13 +1399,6 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
 
                 break;
 
-            case Utilities.TODO:
-
-                marketController.addTodoListItem(message.chatId, message.id);
-                Toast.makeText(getApplicationContext(),"Added to Todo", Toast.LENGTH_SHORT).show();
-
-                break;
-
             case Utilities.LINK:
 
                 break;
@@ -1414,50 +1410,10 @@ public class MainActivity extends AppCompatActivity implements Client.ResultHand
     //endregion
 
 
-    //region------debug stuff
-
-    /*
-    public void printLists()
-    {
-
-
-
-        System.out.println( String.valueOf(easyChatList.size() + "  " + basicGroupsFullInfo.size() + "  " + supergroupsFullInfo.size()));
-
-
-        StringBuilder sb = new StringBuilder();
-        sb.append("Chats: \n");
-        for (int i = 0; i < easyChatList.size(); i++) {
-            sb.append(easyChatList.get(i).title).append("\n");
-        }
-        System.out.println(sb.toString());
-
-
-        sb = new StringBuilder();
-        sb.append("basicgroups: \n");
-        Iterator iter = basicGroupsFullInfo.keySet().iterator();
-        for (int i = 0; i < basicGroupsFullInfo.size(); i++) {
-            sb.append(basicGroupsFullInfo.get(iter.next())).append("\n");
-        }
-        System.out.println(sb.toString());
-
-        sb = new StringBuilder();
-        sb.append("supergroups: \n");
-        iter = supergroupsFullInfo.keySet().iterator();
-        for (int i = 0; i < supergroupsFullInfo.size(); i++) {
-            sb.append(supergroupsFullInfo.get(iter.next())).append("\n");
-        }
-        System.out.println(sb.toString());
-
-    }
-
-     */
 
 
 
 
-
-    //endregion
 
 }
 

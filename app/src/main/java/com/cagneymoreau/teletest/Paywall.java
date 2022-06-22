@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
-import com.cagneymoreau.teletest.data.SimpleSave;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,14 +36,13 @@ public class Paywall {
     private static final String request = "This is why we cant have nice things!!";
 
 
-    SimpleSave simpleSave;
+
 
     Subscription subscription;
     private boolean playStore;
 
     public Paywall(MainActivity activity)
     {
-        simpleSave = SimpleSave.getSimpleSave(activity.getApplicationContext());
 
         if (verifyInstallerId(activity.getApplicationContext())){
             //do google paywall shit
@@ -56,18 +55,7 @@ public class Paywall {
 
     }
 
-    public boolean shouldAnnoyUser()
-    {
-        //check  for trial period or side load purchase
-        if (simpleSave.isAcessGranted()) return false;
 
-        //if downloaded from playstore check there
-        if (playStore && subscription.grantAccess()) return false;
-
-        //not purchased. check to annoy
-        return simpleSave.shouldAnnoyDisplay();
-
-    }
 
     public void userRequestsSubscription()
     {

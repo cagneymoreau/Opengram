@@ -50,7 +50,7 @@ public class Information_Dialog extends DialogFragment {
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
-                sender.setvalue(operation, chat, pos);
+
                 Information_Dialog.this.getDialog().cancel();
             }
         });

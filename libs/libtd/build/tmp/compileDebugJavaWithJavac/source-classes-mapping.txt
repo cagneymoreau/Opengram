@@ -35,13 +35,13 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$AnswerInlineQuery
  org.drinkless.td.libcore.telegram.TdApi$AnswerPreCheckoutQuery
  org.drinkless.td.libcore.telegram.TdApi$AnswerShippingQuery
- org.drinkless.td.libcore.telegram.TdApi$ApproveChatJoinRequest
  org.drinkless.td.libcore.telegram.TdApi$Audio
  org.drinkless.td.libcore.telegram.TdApi$AuthenticationCodeInfo
  org.drinkless.td.libcore.telegram.TdApi$AuthenticationCodeType
  org.drinkless.td.libcore.telegram.TdApi$AuthenticationCodeType$Constructors
  org.drinkless.td.libcore.telegram.TdApi$AuthenticationCodeTypeCall
  org.drinkless.td.libcore.telegram.TdApi$AuthenticationCodeTypeFlashCall
+ org.drinkless.td.libcore.telegram.TdApi$AuthenticationCodeTypeMissedCall
  org.drinkless.td.libcore.telegram.TdApi$AuthenticationCodeTypeSms
  org.drinkless.td.libcore.telegram.TdApi$AuthenticationCodeTypeTelegramMessage
  org.drinkless.td.libcore.telegram.TdApi$AuthorizationState
@@ -148,6 +148,7 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$ChatActionBar$Constructors
  org.drinkless.td.libcore.telegram.TdApi$ChatActionBarAddContact
  org.drinkless.td.libcore.telegram.TdApi$ChatActionBarInviteMembers
+ org.drinkless.td.libcore.telegram.TdApi$ChatActionBarJoinRequest
  org.drinkless.td.libcore.telegram.TdApi$ChatActionBarReportAddBlock
  org.drinkless.td.libcore.telegram.TdApi$ChatActionBarReportSpam
  org.drinkless.td.libcore.telegram.TdApi$ChatActionBarReportUnrelatedLocation
@@ -173,6 +174,7 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$ChatEventAction
  org.drinkless.td.libcore.telegram.TdApi$ChatEventAction$Constructors
  org.drinkless.td.libcore.telegram.TdApi$ChatEventDescriptionChanged
+ org.drinkless.td.libcore.telegram.TdApi$ChatEventHasProtectedContentToggled
  org.drinkless.td.libcore.telegram.TdApi$ChatEventInviteLinkDeleted
  org.drinkless.td.libcore.telegram.TdApi$ChatEventInviteLinkEdited
  org.drinkless.td.libcore.telegram.TdApi$ChatEventInviteLinkRevoked
@@ -191,7 +193,7 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$ChatEventMessageDeleted
  org.drinkless.td.libcore.telegram.TdApi$ChatEventMessageEdited
  org.drinkless.td.libcore.telegram.TdApi$ChatEventMessagePinned
- org.drinkless.td.libcore.telegram.TdApi$ChatEventMessageTtlSettingChanged
+ org.drinkless.td.libcore.telegram.TdApi$ChatEventMessageTtlChanged
  org.drinkless.td.libcore.telegram.TdApi$ChatEventMessageUnpinned
  org.drinkless.td.libcore.telegram.TdApi$ChatEventPermissionsChanged
  org.drinkless.td.libcore.telegram.TdApi$ChatEventPhotoChanged
@@ -202,7 +204,7 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$ChatEventTitleChanged
  org.drinkless.td.libcore.telegram.TdApi$ChatEventUsernameChanged
  org.drinkless.td.libcore.telegram.TdApi$ChatEventVideoChatCreated
- org.drinkless.td.libcore.telegram.TdApi$ChatEventVideoChatDiscarded
+ org.drinkless.td.libcore.telegram.TdApi$ChatEventVideoChatEnded
  org.drinkless.td.libcore.telegram.TdApi$ChatEventVideoChatMuteNewParticipantsToggled
  org.drinkless.td.libcore.telegram.TdApi$ChatEventVideoChatParticipantIsMutedToggled
  org.drinkless.td.libcore.telegram.TdApi$ChatEventVideoChatParticipantVolumeLevelChanged
@@ -320,7 +322,6 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$CloseChat
  org.drinkless.td.libcore.telegram.TdApi$CloseSecretChat
  org.drinkless.td.libcore.telegram.TdApi$ClosedVectorPath
- org.drinkless.td.libcore.telegram.TdApi$ColorReplacement
  org.drinkless.td.libcore.telegram.TdApi$ConfirmQrCodeAuthentication
  org.drinkless.td.libcore.telegram.TdApi$ConnectedWebsite
  org.drinkless.td.libcore.telegram.TdApi$ConnectedWebsites
@@ -353,7 +354,6 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$Date
  org.drinkless.td.libcore.telegram.TdApi$DateRange
  org.drinkless.td.libcore.telegram.TdApi$DatedFile
- org.drinkless.td.libcore.telegram.TdApi$DeclineChatJoinRequest
  org.drinkless.td.libcore.telegram.TdApi$DeepLinkInfo
  org.drinkless.td.libcore.telegram.TdApi$DeleteAccount
  org.drinkless.td.libcore.telegram.TdApi$DeleteAllCallMessages
@@ -362,7 +362,7 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$DeleteChatFilter
  org.drinkless.td.libcore.telegram.TdApi$DeleteChatHistory
  org.drinkless.td.libcore.telegram.TdApi$DeleteChatMessagesByDate
- org.drinkless.td.libcore.telegram.TdApi$DeleteChatMessagesFromUser
+ org.drinkless.td.libcore.telegram.TdApi$DeleteChatMessagesBySender
  org.drinkless.td.libcore.telegram.TdApi$DeleteChatReplyMarkup
  org.drinkless.td.libcore.telegram.TdApi$DeleteCommands
  org.drinkless.td.libcore.telegram.TdApi$DeleteFile
@@ -393,7 +393,6 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$DiceStickersSlotMachine
  org.drinkless.td.libcore.telegram.TdApi$DisableProxy
  org.drinkless.td.libcore.telegram.TdApi$DiscardCall
- org.drinkless.td.libcore.telegram.TdApi$DiscardGroupCall
  org.drinkless.td.libcore.telegram.TdApi$DisconnectAllWebsites
  org.drinkless.td.libcore.telegram.TdApi$DisconnectWebsite
  org.drinkless.td.libcore.telegram.TdApi$Document
@@ -419,6 +418,7 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$EnableProxy
  org.drinkless.td.libcore.telegram.TdApi$EncryptedCredentials
  org.drinkless.td.libcore.telegram.TdApi$EncryptedPassportElement
+ org.drinkless.td.libcore.telegram.TdApi$EndGroupCall
  org.drinkless.td.libcore.telegram.TdApi$EndGroupCallRecording
  org.drinkless.td.libcore.telegram.TdApi$EndGroupCallScreenSharing
  org.drinkless.td.libcore.telegram.TdApi$Error
@@ -472,6 +472,7 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$GetCallbackQueryMessage
  org.drinkless.td.libcore.telegram.TdApi$GetChat
  org.drinkless.td.libcore.telegram.TdApi$GetChatAdministrators
+ org.drinkless.td.libcore.telegram.TdApi$GetChatAvailableMessageSenders
  org.drinkless.td.libcore.telegram.TdApi$GetChatEventLog
  org.drinkless.td.libcore.telegram.TdApi$GetChatFilter
  org.drinkless.td.libcore.telegram.TdApi$GetChatFilterDefaultIconName
@@ -490,7 +491,7 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$GetChatPinnedMessage
  org.drinkless.td.libcore.telegram.TdApi$GetChatScheduledMessages
  org.drinkless.td.libcore.telegram.TdApi$GetChatSparseMessagePositions
- org.drinkless.td.libcore.telegram.TdApi$GetChatSponsoredMessages
+ org.drinkless.td.libcore.telegram.TdApi$GetChatSponsoredMessage
  org.drinkless.td.libcore.telegram.TdApi$GetChatStatistics
  org.drinkless.td.libcore.telegram.TdApi$GetChats
  org.drinkless.td.libcore.telegram.TdApi$GetCommands
@@ -628,6 +629,7 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$InlineKeyboardButtonTypeLoginUrl
  org.drinkless.td.libcore.telegram.TdApi$InlineKeyboardButtonTypeSwitchInline
  org.drinkless.td.libcore.telegram.TdApi$InlineKeyboardButtonTypeUrl
+ org.drinkless.td.libcore.telegram.TdApi$InlineKeyboardButtonTypeUser
  org.drinkless.td.libcore.telegram.TdApi$InlineQueryResult
  org.drinkless.td.libcore.telegram.TdApi$InlineQueryResult$Constructors
  org.drinkless.td.libcore.telegram.TdApi$InlineQueryResultAnimation
@@ -1063,6 +1065,8 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$PollType$Constructors
  org.drinkless.td.libcore.telegram.TdApi$PollTypeQuiz
  org.drinkless.td.libcore.telegram.TdApi$PollTypeRegular
+ org.drinkless.td.libcore.telegram.TdApi$ProcessChatJoinRequest
+ org.drinkless.td.libcore.telegram.TdApi$ProcessChatJoinRequests
  org.drinkless.td.libcore.telegram.TdApi$ProcessPushNotification
  org.drinkless.td.libcore.telegram.TdApi$ProfilePhoto
  org.drinkless.td.libcore.telegram.TdApi$Proxies
@@ -1202,13 +1206,11 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$SearchMessagesFilter$Constructors
  org.drinkless.td.libcore.telegram.TdApi$SearchMessagesFilterAnimation
  org.drinkless.td.libcore.telegram.TdApi$SearchMessagesFilterAudio
- org.drinkless.td.libcore.telegram.TdApi$SearchMessagesFilterCall
  org.drinkless.td.libcore.telegram.TdApi$SearchMessagesFilterChatPhoto
  org.drinkless.td.libcore.telegram.TdApi$SearchMessagesFilterDocument
  org.drinkless.td.libcore.telegram.TdApi$SearchMessagesFilterEmpty
  org.drinkless.td.libcore.telegram.TdApi$SearchMessagesFilterFailedToSend
  org.drinkless.td.libcore.telegram.TdApi$SearchMessagesFilterMention
- org.drinkless.td.libcore.telegram.TdApi$SearchMessagesFilterMissedCall
  org.drinkless.td.libcore.telegram.TdApi$SearchMessagesFilterPhoto
  org.drinkless.td.libcore.telegram.TdApi$SearchMessagesFilterPhotoAndVideo
  org.drinkless.td.libcore.telegram.TdApi$SearchMessagesFilterPinned
@@ -1261,7 +1263,8 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$SetChatDraftMessage
  org.drinkless.td.libcore.telegram.TdApi$SetChatLocation
  org.drinkless.td.libcore.telegram.TdApi$SetChatMemberStatus
- org.drinkless.td.libcore.telegram.TdApi$SetChatMessageTtlSetting
+ org.drinkless.td.libcore.telegram.TdApi$SetChatMessageSender
+ org.drinkless.td.libcore.telegram.TdApi$SetChatMessageTtl
  org.drinkless.td.libcore.telegram.TdApi$SetChatNotificationSettings
  org.drinkless.td.libcore.telegram.TdApi$SetChatPermissions
  org.drinkless.td.libcore.telegram.TdApi$SetChatPhoto
@@ -1277,6 +1280,7 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$SetGroupCallParticipantIsSpeaking
  org.drinkless.td.libcore.telegram.TdApi$SetGroupCallParticipantVolumeLevel
  org.drinkless.td.libcore.telegram.TdApi$SetGroupCallTitle
+ org.drinkless.td.libcore.telegram.TdApi$SetInactiveSessionTtl
  org.drinkless.td.libcore.telegram.TdApi$SetInlineGameScore
  org.drinkless.td.libcore.telegram.TdApi$SetLocation
  org.drinkless.td.libcore.telegram.TdApi$SetLogStream
@@ -1304,7 +1308,6 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$SharePhoneNumber
  org.drinkless.td.libcore.telegram.TdApi$ShippingOption
  org.drinkless.td.libcore.telegram.TdApi$SponsoredMessage
- org.drinkless.td.libcore.telegram.TdApi$SponsoredMessages
  org.drinkless.td.libcore.telegram.TdApi$StartGroupCallRecording
  org.drinkless.td.libcore.telegram.TdApi$StartGroupCallScreenSharing
  org.drinkless.td.libcore.telegram.TdApi$StartScheduledGroupCall
@@ -1330,7 +1333,8 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$SuggestedActionCheckPhoneNumber
  org.drinkless.td.libcore.telegram.TdApi$SuggestedActionConvertToBroadcastGroup
  org.drinkless.td.libcore.telegram.TdApi$SuggestedActionEnableArchiveAndMuteNewChats
- org.drinkless.td.libcore.telegram.TdApi$SuggestedActionSeeTicksHint
+ org.drinkless.td.libcore.telegram.TdApi$SuggestedActionSetPassword
+ org.drinkless.td.libcore.telegram.TdApi$SuggestedActionViewChecksHint
  org.drinkless.td.libcore.telegram.TdApi$Supergroup
  org.drinkless.td.libcore.telegram.TdApi$SupergroupFullInfo
  org.drinkless.td.libcore.telegram.TdApi$SupergroupMembersFilter
@@ -1415,6 +1419,7 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$ThumbnailFormatTgs
  org.drinkless.td.libcore.telegram.TdApi$ThumbnailFormatWebp
  org.drinkless.td.libcore.telegram.TdApi$ToggleChatDefaultDisableNotification
+ org.drinkless.td.libcore.telegram.TdApi$ToggleChatHasProtectedContent
  org.drinkless.td.libcore.telegram.TdApi$ToggleChatIsMarkedAsUnread
  org.drinkless.td.libcore.telegram.TdApi$ToggleChatIsPinned
  org.drinkless.td.libcore.telegram.TdApi$ToggleGroupCallEnabledStartNotification
@@ -1425,6 +1430,8 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$ToggleGroupCallParticipantIsMuted
  org.drinkless.td.libcore.telegram.TdApi$ToggleGroupCallScreenSharingIsPaused
  org.drinkless.td.libcore.telegram.TdApi$ToggleMessageSenderIsBlocked
+ org.drinkless.td.libcore.telegram.TdApi$ToggleSessionCanAcceptCalls
+ org.drinkless.td.libcore.telegram.TdApi$ToggleSessionCanAcceptSecretChats
  org.drinkless.td.libcore.telegram.TdApi$ToggleSupergroupIsAllHistoryAvailable
  org.drinkless.td.libcore.telegram.TdApi$ToggleSupergroupIsBroadcastGroup
  org.drinkless.td.libcore.telegram.TdApi$ToggleSupergroupSignMessages
@@ -1449,16 +1456,19 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$UpdateBasicGroup
  org.drinkless.td.libcore.telegram.TdApi$UpdateBasicGroupFullInfo
  org.drinkless.td.libcore.telegram.TdApi$UpdateCall
+ org.drinkless.td.libcore.telegram.TdApi$UpdateChatAction
  org.drinkless.td.libcore.telegram.TdApi$UpdateChatActionBar
  org.drinkless.td.libcore.telegram.TdApi$UpdateChatDefaultDisableNotification
  org.drinkless.td.libcore.telegram.TdApi$UpdateChatDraftMessage
  org.drinkless.td.libcore.telegram.TdApi$UpdateChatFilters
+ org.drinkless.td.libcore.telegram.TdApi$UpdateChatHasProtectedContent
  org.drinkless.td.libcore.telegram.TdApi$UpdateChatHasScheduledMessages
  org.drinkless.td.libcore.telegram.TdApi$UpdateChatIsBlocked
  org.drinkless.td.libcore.telegram.TdApi$UpdateChatIsMarkedAsUnread
  org.drinkless.td.libcore.telegram.TdApi$UpdateChatLastMessage
  org.drinkless.td.libcore.telegram.TdApi$UpdateChatMember
- org.drinkless.td.libcore.telegram.TdApi$UpdateChatMessageTtlSetting
+ org.drinkless.td.libcore.telegram.TdApi$UpdateChatMessageSender
+ org.drinkless.td.libcore.telegram.TdApi$UpdateChatMessageTtl
  org.drinkless.td.libcore.telegram.TdApi$UpdateChatNotificationSettings
  org.drinkless.td.libcore.telegram.TdApi$UpdateChatOnlineMemberCount
  org.drinkless.td.libcore.telegram.TdApi$UpdateChatPendingJoinRequests
@@ -1527,7 +1537,6 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$UpdateUnreadChatCount
  org.drinkless.td.libcore.telegram.TdApi$UpdateUnreadMessageCount
  org.drinkless.td.libcore.telegram.TdApi$UpdateUser
- org.drinkless.td.libcore.telegram.TdApi$UpdateUserChatAction
  org.drinkless.td.libcore.telegram.TdApi$UpdateUserFullInfo
  org.drinkless.td.libcore.telegram.TdApi$UpdateUserPrivacySettingRules
  org.drinkless.td.libcore.telegram.TdApi$UpdateUserStatus
@@ -1585,7 +1594,6 @@ org/drinkless/td/libcore/telegram/TdApi.java
  org.drinkless.td.libcore.telegram.TdApi$VideoChat
  org.drinkless.td.libcore.telegram.TdApi$VideoNote
  org.drinkless.td.libcore.telegram.TdApi$ViewMessages
- org.drinkless.td.libcore.telegram.TdApi$ViewSponsoredMessage
  org.drinkless.td.libcore.telegram.TdApi$ViewTrendingStickerSets
  org.drinkless.td.libcore.telegram.TdApi$VoiceNote
  org.drinkless.td.libcore.telegram.TdApi$WebPage

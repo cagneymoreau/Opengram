@@ -3,6 +3,8 @@ package com.cagneymoreau.teletest.ui.chatlist;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.SearchView;
@@ -22,6 +24,7 @@ import com.cagneymoreau.teletest.Paywall;
 import com.cagneymoreau.teletest.R;
 import com.cagneymoreau.teletest.RecyclerTouchListener;
 import com.cagneymoreau.teletest.data.Controller;
+import com.cagneymoreau.teletest.data.TelegramController;
 import com.cagneymoreau.teletest.ui.chatlist.recycle.ChatListAdapter;
 import com.google.android.material.tabs.TabLayout;
 
@@ -37,9 +40,7 @@ import java.util.ArrayList;
 public class ChatList extends Fragment  implements SearchView.OnQueryTextListener, DialogSender {
 
 
-
     private final static String TAG = "chatlist_fragment";
-
 
 
     View fragment;
@@ -64,15 +65,23 @@ public class ChatList extends Fragment  implements SearchView.OnQueryTextListene
 
     int list = 1;
 
+    TelegramController telegramController;
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragment = inflater.inflate(R.layout.chatlist_fragment, container, false);
 
-        ((MainActivity)getActivity()).getSupportActionBar().setTitle(getActivity().getResources().getString(R.string.app_name));
-
         controller = Controller.getInstance((MainActivity) getActivity());
+        telegramController = TelegramController.getInstance(((MainActivity) getActivity()));
+
+        String title = getActivity().getResources().getString(R.string.app_name);
+        if (controller.getMessageToForward() != null){
+             title = "...forward to?";
+        }
+
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle(title);
 
         paywall = new Paywall(((MainActivity) getActivity()));
 
@@ -80,11 +89,17 @@ public class ChatList extends Fragment  implements SearchView.OnQueryTextListene
 
     }
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        //((MainActivity)getActivity()).onCreateOptionsMenu(menu);
+        // TODO: 6/23/2022  
+    }
 
     @Override
     public void onPause() {
         super.onPause();
-        ((MainActivity)getActivity()).removeChatAdapter();
+        (telegramController).removeChatAdapter();
     }
 
     @Override
@@ -112,22 +127,22 @@ public class ChatList extends Fragment  implements SearchView.OnQueryTextListene
                 switch (tab.getPosition()){
 
                     case 0:
-                        if (list == 1) return;
+                        //if (list == 1) return;
                         list = 1;
-                        chatlistAdapter.setSortedList(((MainActivity)getActivity()).getChannChatList());
+                        chatlistAdapter.setSortedList(telegramController.getChannChatList());
                         break;
 
                     case 1:
-                        if (list == 2) return;
+                        //if (list == 2) return;
                         list = 2;
-                        chatlistAdapter.setSortedList(((MainActivity)getActivity()).getGroupChatList());
+                        chatlistAdapter.setSortedList(telegramController.getGroupChatList());
                         break;
 
                     case 2:
 
-                        if (list == 3) return;
+                        //if (list == 3) return;
                         list = 3;
-                        chatlistAdapter.setSortedList(((MainActivity)getActivity()).getPrivateChatList());
+                        chatlistAdapter.setSortedList((telegramController).getPrivateChatList());
                         break;
 
                 }
@@ -153,14 +168,14 @@ public class ChatList extends Fragment  implements SearchView.OnQueryTextListene
         recyclerView = fragment.findViewById(R.id.chatlist_recycler);
 
         chatlistAdapter = new ChatListAdapter(((MainActivity) getActivity()), this);
-        chatlistAdapter.setSortedList(((MainActivity)getActivity()).getChannChatList());
-        ((MainActivity)getActivity()).setChatAdapter(chatlistAdapter);
+        chatlistAdapter.setSortedList(telegramController.getChannChatList());
+        telegramController.setChatAdapter(chatlistAdapter);
         recyclerView.setAdapter(chatlistAdapter);
 
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        ((MainActivity)getActivity()).getChatsList();
+        telegramController.getChatsList();
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
@@ -198,7 +213,7 @@ public class ChatList extends Fragment  implements SearchView.OnQueryTextListene
     //when we search we just paste a new list into the adpater
     @Override
     public boolean onQueryTextChange(String s) {
-       chatlistAdapter.setSearchReturn(filter(s,((MainActivity)getActivity()).getEasyChats()));
+       chatlistAdapter.setSearchReturn(filter(s,telegramController.getEasyChats()));
 
        currquery = s;
        handler = new Client.ResultHandler() {
@@ -215,7 +230,7 @@ public class ChatList extends Fragment  implements SearchView.OnQueryTextListene
            }
        };
 
-        ((MainActivity)getActivity()).searchChatsAndUsers(s, handler);
+        telegramController.searchChatsAndUsers(s, handler);
 
        return true;
     }
@@ -245,7 +260,7 @@ public class ChatList extends Fragment  implements SearchView.OnQueryTextListene
         };
 
         for (int i = 0; i < found.length; i++) {
-            ((MainActivity)getActivity()).getChat(found[i], resultHandler);
+            telegramController.getChat(found[i], resultHandler);
         }
     }
 
@@ -271,8 +286,10 @@ public class ChatList extends Fragment  implements SearchView.OnQueryTextListene
     }
 
     //callback for popup long press pop up dialog
+
+
     @Override
-    public void setvalue(int i, TdApi.Chat c, int position) {
+    public void setvalue(Object obj, String operation, int pos, int result) {
 
     }
 

@@ -6,6 +6,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@color/background">
 
+
+
+
     <ScrollView
         android:id="@+id/newgroup_users_chosen_scrollview"
         android:layout_width="match_parent"
@@ -21,7 +24,7 @@
 
             <TextView
                 android:id="@+id/newgroup_users_chosen_textview"
-                android:text="You must add some users"
+                android:text=""
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 

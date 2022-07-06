@@ -12,39 +12,51 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
 
-        app:layout_constraintBottom_toTopOf="@+id/simpleChat_bottom_linear"
+        app:layout_constraintBottom_toTopOf="@+id/simpleChat_bottomwrapper_linear"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
     <LinearLayout
-        android:id="@+id/simpleChat_bottom_linear"
+        android:id="@+id/simpleChat_bottomwrapper_linear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end"
-
+        android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        >
 
-        <ImageButton
-            android:id="@+id/simpleChat_sticker_button"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/simpleChat_bottom_linear"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            />
+            android:orientation="horizontal"
+            android:gravity="end"
 
-        <EditText
-            android:id="@+id/simplechat_messageInput_edittext"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"/>
-        <ImageButton
-            android:id="@+id/simpleChat_sendattach_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            />
+            >
 
+            <ImageButton
+                android:id="@+id/simpleChat_sticker_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+            <EditText
+                android:id="@+id/simplechat_messageInput_edittext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"/>
+            <ImageButton
+                android:id="@+id/simpleChat_sendattach_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                />
+
+
+        </LinearLayout>
 
     </LinearLayout>
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

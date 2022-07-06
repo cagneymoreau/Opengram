@@ -257,7 +257,9 @@ public final class Client implements Runnable {
                 message.contains("SQL logic error or missing database") ||
                 message.contains("database disk image is malformed") ||
                 message.contains("file is encrypted or is not a database") ||
-                message.contains("unsupported file format");
+                message.contains("unsupported file format") ||
+                (message.contains("Database was deleted during execution and can't be recreated") &&
+                message.contains("PosixError : No such file or directory"));
     }
 
     private static boolean isDiskFullError(String message) {

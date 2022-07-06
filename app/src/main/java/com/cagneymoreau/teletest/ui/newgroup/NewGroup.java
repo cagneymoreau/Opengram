@@ -4,15 +4,16 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
-import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -25,7 +26,9 @@ import com.cagneymoreau.teletest.R;
 import com.cagneymoreau.teletest.RecyclerTouchListener;
 import com.cagneymoreau.teletest.Utilities;
 import com.cagneymoreau.teletest.data.Controller;
+import com.cagneymoreau.teletest.data.TelegramController;
 import com.cagneymoreau.teletest.ui.contacts.recycle.ContactsAdapter;
+import com.cagneymoreau.teletest.ui.newgroup.recycle.NewGroupAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.drinkless.td.libcore.telegram.Client;
@@ -33,11 +36,12 @@ import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.concurrent.ConcurrentMap;
 
 
 /**
- * show a recycleview with all the chats available
+ * show a recycleview with all the chats available so we can add members to group
  */
 public class NewGroup extends Fragment  implements SearchView.OnQueryTextListener, DialogSender {
 
@@ -46,9 +50,10 @@ public class NewGroup extends Fragment  implements SearchView.OnQueryTextListene
     View fragment;
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
-    ContactsAdapter contactsAdapter;
+    NewGroupAdapter newGroupAdapter;
 
     Controller controller;
+    TelegramController telegramController;
 
     Paywall paywall;
 
@@ -70,18 +75,19 @@ public class NewGroup extends Fragment  implements SearchView.OnQueryTextListene
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragment = inflater.inflate(R.layout.newgroup_fragment, container, false);
 
-        ((MainActivity)getActivity()).getSupportActionBar().setTitle(getActivity().getResources().getString(R.string.contacts_title));
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle(getActivity().getResources().getString(R.string.newgroup_title));
 
         controller = Controller.getInstance((MainActivity) getActivity());
+        telegramController = TelegramController.getInstance(((MainActivity) getActivity()));
 
         paywall = new Paywall(((MainActivity) getActivity()));
 
         selected = new ArrayList<>();
 
-        buildFrag();
-
         floatingActionButton = fragment.findViewById(R.id.newgroup_fab);
         selectedLayout = fragment.findViewById(R.id.newgroup_users_chosen_layout);
+
+        buildFrag();
 
         ((MainActivity)getActivity()).setQueryListener(this);
 
@@ -92,10 +98,8 @@ public class NewGroup extends Fragment  implements SearchView.OnQueryTextListene
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ((MainActivity)getActivity()).removeChatAdapter();
+        telegramController.removeChatAdapter();
     }
-
-
 
 
 
@@ -105,29 +109,40 @@ public class NewGroup extends Fragment  implements SearchView.OnQueryTextListene
             @Override
             public void onClick(View view) {
 
-                controller.setUsers(selected);
+                if (selected.size() == 0)
+                {
+                    Toast.makeText(getContext(), "You must add some contacts", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
+                controller.setUserList(selected);
+
+                ((MainActivity)getActivity()).closeSearchView();
+
+                controller.setCreateNewGroupFlag(Utilities.GROUP);
                 Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_global_nameGroup);
 
             }
         });
 
 
+        recyclerView = fragment.findViewById(R.id.newgroup_recycler);
 
-        recyclerView = fragment.findViewById(R.id.chatlist_recycler);
+        newGroupAdapter = new NewGroupAdapter(((MainActivity) getActivity()));
 
-        contactsAdapter = new ContactsAdapter(((MainActivity) getActivity()));
-
-        Collection<TdApi.User> val = ((MainActivity)getActivity()).getUsers().values();
+        ConcurrentMap<Long, TdApi.User> users = telegramController.getUsers();
+        Collection<TdApi.User> val = users.values();
         usersList = new ArrayList<>(val);
 
-        contactsAdapter.setList(usersList);
-        recyclerView.setAdapter(contactsAdapter);
+        Collections.sort(usersList, new Utilities.UserComparator());
+
+        newGroupAdapter.setList(usersList);
+        recyclerView.setAdapter(newGroupAdapter);
 
         layoutManager = new LinearLayoutManager(getActivity());
         recyclerView.setLayoutManager(layoutManager);
 
-        ((MainActivity)getActivity()).getChatsList();
+        telegramController.getChatsList();
 
         recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
             @Override
@@ -149,18 +164,28 @@ public class NewGroup extends Fragment  implements SearchView.OnQueryTextListene
 
     private void refreshSelected(int p)
     {
-        selected.add(usersList.get(p));
+        TdApi.User user = newGroupAdapter.getUser(p);
+
+        selected.add(user);
 
         LinearLayout linearLayout = new LinearLayout(fragment.getContext());
         linearLayout.setOrientation(LinearLayout.HORIZONTAL);
 
         ImageView avatar = new ImageView(linearLayout.getContext());
-        Utilities.setUserAvater(usersList.get(p), avatar, ((MainActivity) getActivity()));
+        Utilities.setUserAvater(user, avatar, ((MainActivity) getActivity()));
         linearLayout.addView(avatar);
 
         TextView name = new TextView(linearLayout.getContext());
-        name.setText(usersList.get(p).firstName);
+        name.setText(user.firstName);
         linearLayout.addView(name);
+
+        linearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                selected.remove(user);
+                selectedLayout.removeView(linearLayout);
+            }
+        });
 
         selectedLayout.addView(linearLayout);
 
@@ -175,7 +200,8 @@ public class NewGroup extends Fragment  implements SearchView.OnQueryTextListene
     //when we search we just paste a new list into the adpater
     @Override
     public boolean onQueryTextChange(String s) {
-       contactsAdapter.setSearchReturn(filter(s,((MainActivity)getActivity()).getUsers()));
+        ArrayList<TdApi.User> list = Utilities.filter(s,telegramController.getUsers(), true);
+       newGroupAdapter.setSearchReturn(list);
 
        currquery = s;
 
@@ -183,34 +209,8 @@ public class NewGroup extends Fragment  implements SearchView.OnQueryTextListene
     }
 
 
-
-
-    private ArrayList<TdApi.User> filter(String query, ConcurrentMap<Long, TdApi.User> users)
-    {
-        if (query.isEmpty()) return null;
-
-        query = query.toLowerCase();
-
-        Collection<TdApi.User> val = users.values();
-        usersList = new ArrayList<>(val);
-
-        ArrayList<TdApi.User> matchingchats = new ArrayList<>();
-
-        for (int i = 0; i < usersList.size(); i++) {
-
-            String title = usersList.get(i).firstName.toLowerCase();
-
-            if (title.contains(query)) matchingchats.add(usersList.get(i));
-
-        }
-
-        return matchingchats;
-
-    }
-
-    //callback for popup long press pop up dialog
     @Override
-    public void setvalue(int i, TdApi.Chat c, int position) {
+    public void setvalue(Object obj, String operation, int pos, int result) {
 
     }
 

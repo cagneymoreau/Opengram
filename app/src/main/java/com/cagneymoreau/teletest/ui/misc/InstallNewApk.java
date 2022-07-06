@@ -15,6 +15,7 @@ import com.cagneymoreau.teletest.DialogSender;
 import com.cagneymoreau.teletest.MainActivity;
 import com.cagneymoreau.teletest.R;
 import com.cagneymoreau.teletest.Update;
+import com.cagneymoreau.teletest.data.TelegramController;
 
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -27,6 +28,8 @@ public class InstallNewApk extends Fragment implements DialogSender {
 
     TextView walloftextview;
 
+    TelegramController telegramController;
+
     //0 = idle, 1 = downloading, 2 = success, -1 = failed;
     int statusflag = 0;
 
@@ -37,6 +40,7 @@ public class InstallNewApk extends Fragment implements DialogSender {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         fragmentView = inflater.inflate(R.layout.about_layout, container, false);
+        telegramController = TelegramController.getInstance(((MainActivity) getActivity()));
 
         deleteButton = fragmentView.findViewById(R.id.about_privacy_button);
         deleteButton.setVisibility(View.INVISIBLE);
@@ -56,7 +60,7 @@ public class InstallNewApk extends Fragment implements DialogSender {
 
     private void buildUI()
     {
-        if (!Update.isDownLoaded(((MainActivity)getActivity()).getApk(), ((MainActivity) getActivity()))){
+        if (!Update.isDownLoaded(telegramController.getApk(), telegramController)){
             
             button.setText("Download");
             button.setOnClickListener(new View.OnClickListener() {
@@ -65,8 +69,8 @@ public class InstallNewApk extends Fragment implements DialogSender {
 
                     if (statusflag == 1) return;
 
-                   setvalue(1, null, 0);
-                    Update.downloadApk(((MainActivity)getActivity()).getApk(), ((MainActivity)getActivity()));
+                   setvalue(null,"",0,1);
+                    Update.downloadApk(telegramController.getApk(), telegramController);
                     getActivity().onBackPressed();
                 }
             });
@@ -76,7 +80,7 @@ public class InstallNewApk extends Fragment implements DialogSender {
             button.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Update.openApkInstall(getActivity(), ((MainActivity)getActivity()).getApkFile());
+                    Update.openApkInstall(getActivity(), telegramController.getApkFile());
                 }
             });
         }
@@ -86,8 +90,8 @@ public class InstallNewApk extends Fragment implements DialogSender {
 
 
     @Override
-    public void setvalue(int i, TdApi.Chat c, int pos) {
-        statusflag = i;
+    public void setvalue(Object obj, String operation, int pos, int result) {
+        statusflag = result;
         switch (statusflag){
 
             case 0:

@@ -29,12 +29,12 @@ class NewGroupViewHolder extends RecyclerView.ViewHolder {
 
         view = itemView;
 
-        avatar_imgView = view.findViewById(R.id.chatlist_card_avatar_imageview);
+        avatar_imgView = view.findViewById(R.id.contacts_card_avatar_imageview);
         avatar_imgView.getLayoutParams().height = 80;
 
 
-        username_tv = view.findViewById(R.id.chatlist_card_chatTitle_textView);
-        lastSeen_tv = view.findViewById(R.id.chatlist_card_preview_textview);
+        username_tv = view.findViewById(R.id.contacts_card_name_textView);
+        lastSeen_tv = view.findViewById(R.id.contacts_card_lastseen_textview);
 
 
     }

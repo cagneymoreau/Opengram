@@ -11,6 +11,8 @@ import android.util.Log;
 
 import androidx.core.content.FileProvider;
 
+import com.cagneymoreau.teletest.data.TelegramController;
+
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
 
@@ -37,10 +39,10 @@ public class Update {
 
     /**
      * Find message containing
-     * @param mainActivity
      */
-    public static void findUpdatedApk(MainActivity mainActivity)
+    public static void findUpdatedApk(TelegramController telegramController)
     {
+
 
 
 
@@ -81,20 +83,20 @@ public class Update {
                 if (update > BuildConfig.VERSION_CODE){
 
                     TdApi.Document apk = (TdApi.Document) messDoc.document;
-                    mainActivity.newApkAvailable(apk, args);
+                    telegramController.newApkAvailable(apk, args);
 
                 }
             }
         };
 
-        mainActivity.getMessage(
+        telegramController.getMessage(
                 channelID,
                 messID,
                 handler);
     }
 
 
-    public static boolean isDownLoaded(TdApi.Document document, MainActivity mainActivity)
+    public static boolean isDownLoaded(TdApi.Document document, TelegramController telegramController)
     {
         TdApi.File file = document.document;
 
@@ -106,7 +108,7 @@ public class Update {
 
             if (name.length != 2 || !name[1].equals("apk")) return false;
 
-            mainActivity.setApkFile(localApk);
+            telegramController.setApkFile(localApk);
 
             return true;
         }
@@ -116,12 +118,12 @@ public class Update {
 
 
 
-    public static void downloadApk(TdApi.Document document, MainActivity mainActivity)
+    public static void downloadApk(TdApi.Document document, TelegramController telegramController)
     {
         TdApi.File file = document.document;
 
 
-            mainActivity.getRemoteFile(file.remote.id, new TdApi.FileTypeUnknown(), new Client.ResultHandler() {
+            telegramController.getRemoteFile(file.remote.id, new TdApi.FileTypeUnknown(), new Client.ResultHandler() {
                 @Override
                 public void onResult(TdApi.Object object) {
 
@@ -133,7 +135,7 @@ public class Update {
 
                     TdApi.File actualFile = (TdApi.File) object;
                     
-                    mainActivity.downloadFile(actualFile.id, 1, new Client.ResultHandler() {
+                    telegramController.downloadFile(actualFile.id, 1, new Client.ResultHandler() {
                         @Override
                         public void onResult(TdApi.Object object) {
                             
@@ -151,7 +153,7 @@ public class Update {
 
                             if (name.length < 2 || !name[1].equals("apk")) return;
 
-                            mainActivity.setApkFile(localApk);
+                            telegramController.setApkFile(localApk);
 
 
                         }

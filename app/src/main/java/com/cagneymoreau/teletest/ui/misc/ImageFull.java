@@ -16,6 +16,8 @@ import androidx.fragment.app.Fragment;
 import com.cagneymoreau.teletest.MainActivity;
 import com.cagneymoreau.teletest.R;
 import com.cagneymoreau.teletest.Utilities;
+import com.cagneymoreau.teletest.data.Controller;
+import com.cagneymoreau.teletest.data.TelegramController;
 
 
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -36,7 +38,7 @@ public class ImageFull extends Fragment {
 
     ImageView imageView;
 
-
+    Controller controller;
 
 
     @Nullable
@@ -44,8 +46,9 @@ public class ImageFull extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 
         fragmentView = inflater.inflate(R.layout.image_full, container, false);
+        controller = Controller.getInstance(((MainActivity) getActivity()));
 
-        ArrayList<Object> list = ((MainActivity)getActivity()).getDataBinding();
+        ArrayList<Object> list = controller.getDataBinding();
 
         TdApi.MessagePhoto mPhoto = (TdApi.MessagePhoto) list.get(0);
 

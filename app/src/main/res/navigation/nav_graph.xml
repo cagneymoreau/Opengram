@@ -79,10 +79,11 @@
     <action android:id="@+id/action_global_update" app:destination="@id/update"/>
 
     <fragment
-        android:id="@+id/newGroup"
+        android:id="@+id/newGroup2"
         android:name="com.cagneymoreau.teletest.ui.newgroup.NewGroup"
-        android:label="NewGroup" />
-    <action android:id="@+id/action_global_nameGroup" app:destination="@id/nameGroup"/><action android:id="@+id/action_global_newGroup" app:destination="@id/newGroup"/>
+        android:label="NewGroup2" />
+    <action android:id="@+id/action_global_nameGroup" app:destination="@id/nameGroup"/>
+    <action android:id="@+id/action_global_newGroup2" app:destination="@id/newGroup2"/>
 
 
     <!-- Fragments below Main Menu Tier  -->
@@ -110,6 +111,20 @@
         android:name="com.cagneymoreau.teletest.ui.contacts.Contacts"
         android:label="Contacts" />
     <action android:id="@+id/action_global_contacts2" app:destination="@id/contacts"/>
+    <fragment
+        android:id="@+id/profile"
+        android:name="com.cagneymoreau.teletest.ui.misc.Profile"
+        android:label="Profile" /><action android:id="@+id/action_global_profile" app:destination="@id/profile"/>
+    <fragment
+        android:id="@+id/newGroup"
+        android:name="com.cagneymoreau.teletest.ui.newgroup.GroupType"
+        android:label="newGroup" />
+    <action android:id="@+id/action_global_newgroup_groupType" app:destination="@id/newGroup" />
+
+    <fragment
+        android:id="@+id/visibility"
+        android:name="com.cagneymoreau.teletest.ui.newgroup.Visibility"
+        android:label="Visibility" /><action android:id="@+id/action_global_visibility" app:destination="@id/visibility"/>
 
 
 </navigation>

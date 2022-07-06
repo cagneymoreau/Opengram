@@ -16,6 +16,7 @@ import com.cagneymoreau.teletest.MainActivity;
 import com.cagneymoreau.teletest.Paywall;
 import com.cagneymoreau.teletest.R;
 import com.cagneymoreau.teletest.data.Controller;
+import com.cagneymoreau.teletest.data.TelegramController;
 import com.cagneymoreau.teletest.ui.calllogs.recycle.CallLogAdapter;
 
 import org.drinkless.td.libcore.telegram.Client;
@@ -43,6 +44,7 @@ public class CallLog extends Fragment  implements SearchView.OnQueryTextListener
     CallLogAdapter contactsAdapter;
 
     Controller controller;
+    TelegramController telegramController;
 
     Paywall paywall;
 
@@ -77,7 +79,7 @@ public class CallLog extends Fragment  implements SearchView.OnQueryTextListener
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ((MainActivity)getActivity()).removeChatAdapter();
+        telegramController.removeChatAdapter();
     }
 
 
@@ -98,7 +100,7 @@ public class CallLog extends Fragment  implements SearchView.OnQueryTextListener
     //when we search we just paste a new list into the adpater
     @Override
     public boolean onQueryTextChange(String s) {
-       contactsAdapter.setSearchReturn(filter(s,((MainActivity)getActivity()).getUsers()));
+       contactsAdapter.setSearchReturn(filter(s,telegramController.getUsers()));
 
        currquery = s;
 
@@ -131,9 +133,8 @@ public class CallLog extends Fragment  implements SearchView.OnQueryTextListener
 
     }
 
-    //callback for popup long press pop up dialog
     @Override
-    public void setvalue(int i, TdApi.Chat c, int position) {
+    public void setvalue(Object obj, String operation, int pos, int result) {
 
     }
 

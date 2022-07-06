@@ -72,6 +72,8 @@ public class NewGroupAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolde
     }
 
 
+
+
     public TdApi.User getUser(int i)
     {
             return userList.get(i);

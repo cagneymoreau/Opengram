@@ -1,15 +1,21 @@
 package com.cagneymoreau.teletest.ui.newgroup;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -18,55 +24,70 @@ import com.cagneymoreau.teletest.MainActivity;
 import com.cagneymoreau.teletest.Paywall;
 import com.cagneymoreau.teletest.R;
 import com.cagneymoreau.teletest.RecyclerTouchListener;
+import com.cagneymoreau.teletest.Utilities;
 import com.cagneymoreau.teletest.data.Controller;
+import com.cagneymoreau.teletest.data.TelegramController;
 import com.cagneymoreau.teletest.ui.contacts.recycle.ContactsAdapter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.ConcurrentMap;
+
+import kotlin.Suppress;
 
 
 /**
- * show a recycleview with all the chats available
+ * shows when making a group or channel to insert name, image and description
+ *
  */
-public class NameGroup extends Fragment  implements SearchView.OnQueryTextListener, DialogSender {
+public class NameGroup extends Fragment {
 
-    private final static String TAG = "chatlist_fragment";
+    private final static String TAG = "namegroup_fragment";
 
 
     View fragment;
-    RecyclerView recyclerView;
-    RecyclerView.LayoutManager layoutManager;
-    ContactsAdapter contactsAdapter;
-
     Controller controller;
+    TelegramController telegramController;
 
-    Paywall paywall;
+    ImageView imgview;
+    EditText nameET, desET;
 
-    EditText editText;
+    FloatingActionButton floatingActionButton;
 
-    String currquery;
+    String flag;
 
-    ArrayList<TdApi.User> usersList;
-
+    ArrayList<TdApi.User> groupmembers;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        fragment = inflater.inflate(R.layout.contacts_fragment, container, false);
+        fragment = inflater.inflate(R.layout.namegroup_layout, container, false);
 
-        ((MainActivity)getActivity()).getSupportActionBar().setTitle(getActivity().getResources().getString(R.string.contacts_title));
+        ((MainActivity)getActivity()).getSupportActionBar().setTitle(getActivity().getResources().getString(R.string.namegroup_title));
 
         controller = Controller.getInstance((MainActivity) getActivity());
+        telegramController = TelegramController.getInstance(((MainActivity) getActivity()));
 
-        paywall = new Paywall(((MainActivity) getActivity()));
+        groupmembers = controller.getUserList();
+
+        flag = controller.getCreateNewGroupFlag();
+
+        imgview = fragment.findViewById(R.id.namegroup_imageview);
+
+        nameET = fragment.findViewById(R.id.namegroup_name_edittext);
+        desET = fragment.findViewById(R.id.namegroup_description_edittext);
+
+
+
+
+        floatingActionButton = fragment.findViewById(R.id.namegroup_fab);
 
         buildFrag();
-        editText = fragment.findViewById(R.id.namegroup_edittext);
-
-        ((MainActivity)getActivity()).setQueryListener(this);
 
         return fragment;
 
@@ -75,7 +96,7 @@ public class NameGroup extends Fragment  implements SearchView.OnQueryTextListen
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ((MainActivity)getActivity()).removeChatAdapter();
+        telegramController.removeChatAdapter();
     }
 
 
@@ -84,101 +105,86 @@ public class NameGroup extends Fragment  implements SearchView.OnQueryTextListen
 
     private void buildFrag() {
 
-        recyclerView = fragment.findViewById(R.id.chatlist_recycler);
 
-        contactsAdapter = new ContactsAdapter(((MainActivity) getActivity()));
+        imgview.setOnClickListener(view -> {
 
-        Collection<TdApi.User> val = ((MainActivity)getActivity()).getUsers().values();
-        usersList = new ArrayList<>(val);
+            // TODO: 6/27/2022 open gallery 
 
-        contactsAdapter.setList(usersList);
-        recyclerView.setAdapter(contactsAdapter);
+        });
 
-        layoutManager = new LinearLayoutManager(getActivity());
-        recyclerView.setLayoutManager(layoutManager);
-
-        ((MainActivity)getActivity()).getChatsList();
-
-        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getActivity(), recyclerView, new RecyclerTouchListener.ClickListener() {
-            @Override
-            public void onClick(View view, int position, float x, float y) {
-
-                //((MainActivity)getActivity()).getChatsList();
-
-                //((MainActivity)getActivity()).getChatHistory(chatlistAdapter.getChat(position), 0,5);
-
-                //((MainActivity)getActivity()).printLists();
-               // Bundle b = new Bundle();
-                //long id = contactsAdapter.getChat(position).id;
-               // b.putLong("chatId", id);
-               // Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_global_simpleChat, b);
-
-
-            }
-
-            @Override
-            public void onLongClick(View view, int position, float x, float y) {
-
-
-
-            }
-        }));
-
-    }
-
-
-    @Override
-    public boolean onQueryTextSubmit(String s) {
-        return false;
-    }
-
-    //when we search we just paste a new list into the adpater
-    @Override
-    public boolean onQueryTextChange(String s) {
-       contactsAdapter.setSearchReturn(filter(s,((MainActivity)getActivity()).getUsers()));
-
-       currquery = s;
-
-       return true;
-    }
-
-
-
-
-    private ArrayList<TdApi.User> filter(String query, ConcurrentMap<Long, TdApi.User> users)
-    {
-        if (query.isEmpty()) return null;
-
-        query = query.toLowerCase();
-
-        Collection<TdApi.User> val = users.values();
-        usersList = new ArrayList<>(val);
-
-        ArrayList<TdApi.User> matchingchats = new ArrayList<>();
-
-        for (int i = 0; i < usersList.size(); i++) {
-
-            String title = usersList.get(i).firstName.toLowerCase();
-
-            if (title.contains(query)) matchingchats.add(usersList.get(i));
-
+        if (flag == Utilities.GROUP){
+            desET.setVisibility(View.INVISIBLE);
         }
 
-        return matchingchats;
+       floatingActionButton.setOnClickListener(view -> {
+
+           //create group and navigate to temp landing page while group is formed
+           if (flag.equals(Utilities.GROUP))
+           {
+
+               String groupName = nameET.getText().toString();
+
+               long[] memids = new long[groupmembers.size()];
+
+               for (int i = 0; i < groupmembers.size(); i++) {
+
+                   memids[i] = groupmembers.get(i).id;
+               }
+
+
+               Client.ResultHandler handler = object -> {
+
+                   if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR)
+                   {
+                       TdApi.Chat c = (TdApi.Chat) object;
+
+                       Bundle b = new Bundle();
+                       long id = c.id;
+                       b.putLong("chatId", id);
+                       getActivity().runOnUiThread(() -> {
+                           Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_global_simpleChat, b);
+                       });
+
+                   }
+
+               };
+
+               telegramController.createGroup(memids, groupName, handler);
+
+           }
+           else if(flag.equals(Utilities.CHANNEL))
+           {
+
+               Client.ResultHandler handler = object -> {
+
+                   if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR)
+                   {
+                       TdApi.Chat c = (TdApi.Chat) object;
+
+                       Bundle b = new Bundle();
+                       long id = c.id;
+                       b.putLong("chatId", id);
+                       getActivity().runOnUiThread(() ->{
+                           Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_global_visibility, b);
+                       });
+                   }
+               };
+
+               String name = nameET.getText().toString();
+               String desc = desET.getText().toString();
+
+               telegramController.createChannel(name, desc, handler);
+           }
+
+       });
+
+
+
 
     }
 
-    //callback for popup long press pop up dialog
-    @Override
-    public void setvalue(int i, TdApi.Chat c, int position) {
 
-    }
 
-    //lets list attach to our adapter
-    public Controller getMarketController()
-    {
-        return controller;
-    }
 
 
 

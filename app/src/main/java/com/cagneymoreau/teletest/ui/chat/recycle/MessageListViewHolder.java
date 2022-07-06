@@ -1,30 +1,23 @@
 package com.cagneymoreau.teletest.ui.chat.recycle;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.provider.ContactsContract;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.MimeTypeMap;
-import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.MediaController;
 import android.widget.PopupMenu;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.widget.ImageViewCompat;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -34,16 +27,15 @@ import com.cagneymoreau.teletest.MainActivity;
 import com.cagneymoreau.teletest.MessageListCallback;
 import com.cagneymoreau.teletest.R;
 import com.cagneymoreau.teletest.Utilities;
+import com.cagneymoreau.teletest.data.Controller;
+import com.cagneymoreau.teletest.data.TelegramController;
 
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
-
-import okhttp3.internal.Util;
 
 /**
  * Any time you have a message list use this viewholder
@@ -53,7 +45,8 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
 
     private static final String TAG = "simplechatviewholder";
 
-
+    TelegramController telegramController;
+    Controller controller;
 
     View view;
     ImageView /*imageViewContent ,*/ imageviewIn, imageviewOut;
@@ -73,6 +66,8 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
     public MessageListViewHolder(@NonNull View itemView, MainActivity a, MessageListCallback callback) {
         super(itemView);
 
+        telegramController = TelegramController.getInstance(a);
+        controller = Controller.getInstance(a);
         view = itemView;
         mainActivity = a;
         this.callback = callback;
@@ -151,11 +146,15 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
 
     }
 
-
     private void buildTextMessage(TdApi.Message m, boolean outgoing)
     {
       //imageViewContent.setVisibility(View.INVISIBLE);
       TdApi.MessageText mtext = ((TdApi.MessageText) m.content);
+
+      if (mtext.webPage != null){
+          buildWebPreviewMessage(mtext, outgoing);
+          return;
+      }
 
         contentLayout.removeAllViews();
         TextView tv = new TextView(view.getContext());
@@ -173,6 +172,45 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
 
     }
 
+    private void buildWebPreviewMessage(TdApi.MessageText mtext, boolean outgoing)
+    {
+
+        contentLayout.removeAllViews();
+
+        View weblayout = View.inflate(contentLayout.getContext(), R.layout.web_preview_layout, contentLayout);
+
+        String message = mtext.text.text;
+        message = message.substring(mtext.text.entities[0].offset, (mtext.text.entities[0].offset + mtext.text.entities[0].length) );
+
+        if (!message.isEmpty()) {
+            TextView tv = weblayout.findViewById(R.id.webPreview_messageText_TextView);
+            tv.setTextColor(txtColor);
+            tv.setText(mtext.text.text);
+            tv.setText(message);
+        }
+
+        TextView tvLink = weblayout.findViewById(R.id.webPreview_linkText_TextView);
+        tvLink.setTextColor(txtColor);
+        tvLink.setText(mtext.webPage.url);
+
+        TextView content = weblayout.findViewById(R.id.webPreview_contentPrev_TextView);
+        content.setTextColor(txtColor);
+        content.setText(mtext.webPage.title);
+
+        ImageView imageView = weblayout.findViewById(R.id.webPreview_photoPrev_TextView);
+        Utilities.setWebViewImage(mtext.webPage, imageView, mainActivity);
+
+        if (outgoing){
+            weblayout.setPadding(padding,padding,pointpadding,padding);
+        }else{
+            weblayout.setPadding(pointpadding,padding,padding,padding);
+        }
+
+        contentLayout.addView(weblayout);
+
+        //textView.setText(mtext.text.text);
+
+    }
 
     private void buildPictureMessage(TdApi.Message m, boolean outgoing)
     {
@@ -188,7 +226,7 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
         imageViewContent.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mainActivity.setDataBindingItem(mPhoto);
+                controller.setDataBindingItem(mPhoto);
                 Navigation.findNavController(mainActivity, R.id.nav_host_fragment).navigate(R.id.action_global_imageFull);
             }
         });
@@ -296,7 +334,7 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
                 }
             };
 
-            mainActivity.downloadFile( messageAudio.audio.audio.id, 1, h);
+            telegramController.downloadFile( messageAudio.audio.audio.id, 1, h);
 
         }
 
@@ -394,7 +432,7 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
                 }
             };
 
-            mainActivity.downloadFile( messageAudio.voiceNote.voice.id, 1, h);
+            telegramController.downloadFile( messageAudio.voiceNote.voice.id, 1, h);
 
         }
 
@@ -405,9 +443,18 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
         TdApi.MessageVideo messageVideo = (TdApi.MessageVideo) m.content;
 
         contentLayout.removeAllViews();
+        LinearLayout l = new LinearLayout(contentLayout.getContext());
         VideoView videoView = new VideoView(mainActivity);
         videoView.setLayoutParams(new FrameLayout.LayoutParams(256, 256));
-        contentLayout.addView(videoView);
+
+        if (outgoing){
+           l. setPadding(padding,padding,pointpadding,padding);
+        }else{
+            l.setPadding(pointpadding,padding,padding,padding);
+        }
+
+        l.addView(videoView);
+        contentLayout.addView(l);
         prepared = false;
 
         videoView.setOnClickListener(new View.OnClickListener() {
@@ -416,7 +463,18 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
 
                 if (!prepared) return;
 
-                videoView.start();
+                if (videoView.isPlaying() )
+                {
+                     if( videoView.canPause())
+                    {
+                        videoView.pause();
+                    }
+
+                }else{
+                    videoView.start();
+                }
+
+
             }
         });
 
@@ -487,7 +545,7 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
                 }
             };
 
-            mainActivity.downloadFile( messageVideo.video.video.id, 1, h);
+            telegramController.downloadFile( messageVideo.video.video.id, 1, h);
 
         }
     }
@@ -579,7 +637,7 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
                 }
             };
 
-            mainActivity.downloadFile( messageVideo.videoNote.video.id, 1, h);
+            telegramController.downloadFile( messageVideo.videoNote.video.id, 1, h);
 
         }
 
@@ -648,7 +706,7 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
                         }
                     };
 
-                    mainActivity.downloadFile( messageDocument.document.document.id, 1, h);
+                    telegramController.downloadFile( messageDocument.document.document.id, 1, h);
 
                 }
 
@@ -785,7 +843,7 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
                 }
             };
 
-            mainActivity.downloadFile( messageAnimation.animation.animation.id, 1, h);
+            telegramController.downloadFile( messageAnimation.animation.animation.id, 1, h);
 
         }
 
@@ -826,12 +884,12 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
 
     private boolean bubbleWrap(TdApi.Message m)
     {
-       if(TdApi.MessageSenderUser.CONSTRUCTOR == m.sender.getConstructor()){
+       if(TdApi.MessageSenderUser.CONSTRUCTOR == m.senderId.getConstructor()){
 
-           TdApi.MessageSenderUser user = (TdApi.MessageSenderUser) m.sender;
-           TdApi.User user1 = mainActivity.getUser(user.userId);
+           TdApi.MessageSenderUser user = (TdApi.MessageSenderUser) m.senderId;
+           TdApi.User user1 = telegramController.getUser(user.userId);
 
-           if (user.userId == mainActivity.getMyId()){
+           if (user.userId == telegramController.getMyId()){
                //out
 
                //contentConst.setBackgroundResource(R.drawable.outgoing_bubble);
@@ -842,7 +900,7 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
 
                //imageviewIn.setVisibility(View.INVISIBLE);
                imageviewIn.setImageResource(R.drawable.ic_baseline_more_vert_24);
-               imageviewIn.setOnClickListener(getListener(m, imageviewIn));
+               imageviewIn.setOnClickListener(getMenuListener(m, imageviewIn));
                //imageviewOut.setVisibility(View.VISIBLE);
               //Utilities.getUserImage(user1, imageviewOut, mainActivity);
                Utilities.setUserAvater(user1, imageviewOut, mainActivity);
@@ -861,7 +919,7 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
                //imageviewIn.setVisibility(View.VISIBLE);
                //imageviewOut.setVisibility(View.INVISIBLE);
                imageviewOut.setImageResource(R.drawable.ic_baseline_more_vert_24);
-               imageviewOut.setOnClickListener(getListener(m, imageviewOut));
+               imageviewOut.setOnClickListener(getMenuListener(m, imageviewOut));
                //Utilities.getUserImage(user1, imageviewIn, mainActivity);
                Utilities.setUserAvater(user1, imageviewIn, mainActivity);
 
@@ -879,7 +937,7 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
            //imageviewIn.setVisibility(View.VISIBLE);
            //imageviewOut.setVisibility(View.INVISIBLE);
            imageviewOut.setImageResource(R.drawable.ic_baseline_more_vert_24);
-           imageviewOut.setOnClickListener(getListener(m, imageviewOut));
+           imageviewOut.setOnClickListener(getMenuListener(m, imageviewOut));
            return false;
        }
 
@@ -887,7 +945,7 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
     }
 
 
-    private View.OnClickListener getListener(TdApi.Message m, ImageView anchor)
+    private View.OnClickListener getMenuListener(TdApi.Message m, ImageView anchor)
     {
         return new View.OnClickListener() {
             @Override
@@ -901,10 +959,6 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
                 if (m.canBeEdited) options.add(Utilities.EDIT);
                 if (m.canBeDeletedOnlyForSelf || m.canBeDeletedForAllUsers) options.add(Utilities.DELETE);
                 // TODO: 2/23/2022 pinned
-                options.add(Utilities.SAVE);
-                options.add(Utilities.TODO);
-                // TODO: 2/23/2022 html link
-
 
                 PopupMenu popupMenu = new PopupMenu(contentLayout.getContext(), anchor);
 
@@ -923,12 +977,26 @@ public class MessageListViewHolder extends RecyclerView.ViewHolder {
 
                 popupMenu.show();
 
-
             }
         };
 
     }
 
+
+    private View.OnClickListener getProfileListener(TdApi.User user)
+    {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                controller.setDataBindingItem(user);
+                Navigation.findNavController(mainActivity, R.id.nav_host_fragment).navigate(R.id.action_global_profile);
+
+
+            }
+        };
+
+    }
 
 
 

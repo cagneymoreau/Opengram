@@ -6,6 +6,9 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -14,25 +17,32 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cagneymoreau.teletest.DialogSender;
 import com.cagneymoreau.teletest.MainActivity;
 import com.cagneymoreau.teletest.MessageListCallback;
 import com.cagneymoreau.teletest.R;
 import com.cagneymoreau.teletest.RecyclerTouchListener;
 import com.cagneymoreau.teletest.Utilities;
+import com.cagneymoreau.teletest.data.Controller;
+import com.cagneymoreau.teletest.data.TelegramController;
+import com.cagneymoreau.teletest.ui.Delete_Dialog;
 import com.cagneymoreau.teletest.ui.chat.recycle.MessageListAdapter;
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
 
 import java.util.ArrayList;
+
 
 // TODO: 1/26/2022 text input + paste?
 // TODO: 1/26/2022 attach stuff input pic, video file
@@ -43,7 +53,7 @@ import java.util.ArrayList;
 /**
  * Interact with a specific chat
  */
-public class SimpleChat extends Fragment implements MessageListCallback {
+public class SimpleChat extends Fragment implements MessageListCallback, DialogSender {
 
 
     TdApi.SearchChatMessages h;
@@ -77,21 +87,31 @@ public class SimpleChat extends Fragment implements MessageListCallback {
 
     TdApi.Chat chat;
 
+    TelegramController telegramController;
+    Controller controller;
+
+    String sendState = Utilities.NEWMESS;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragment = inflater.inflate(R.layout.simple_chat, container, false);
 
+        telegramController = TelegramController.getInstance(((MainActivity) getActivity()));
+        controller = Controller.getInstance((MainActivity) getActivity());
+
+        //((MainActivity)getActivity()).getSupportActionBar().setDisplayOptions();
+
         prevId = 0L;
 
         chatId = getArguments().getLong("chatId");
 
-        chat = ((MainActivity)getActivity()).getSpecificChat(chatId);
+        chat = telegramController.getSpecificChat(chatId);
 
         if (chat == null){
 
 
-            ((MainActivity)getActivity()).createNewPrivateChat(chatId, new Client.ResultHandler() {
+            telegramController.createNewPrivateChat(chatId, new Client.ResultHandler() {
                 @Override
                 public void onResult(TdApi.Object object) {
                     if (object.getConstructor() == TdApi.Chat.CONSTRUCTOR){
@@ -113,6 +133,34 @@ public class SimpleChat extends Fragment implements MessageListCallback {
         return fragment;
     }
 
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.add(Menu.NONE, 1, Menu.NONE, "Search");
+        // TODO: 6/23/2022  
+        
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+       switch (item.getItemId())
+       {
+
+           case 1:
+
+           return true;
+           
+           case 2:
+               
+           return true;
+           
+           default:
+               
+           return false;    
+
+       }
+    }
+
     private void loadChat()
     {
 
@@ -131,6 +179,18 @@ public class SimpleChat extends Fragment implements MessageListCallback {
             buildChannelUI();
         }else{
             buildCanPostUI();
+            TdApi.Message m = controller.getMessageToForward();
+            if (m != null){
+
+                LinearLayout btmwrapLayout = fragment.findViewById(R.id.simpleChat_bottomwrapper_linear);
+
+                View reply = buildReplyView(m);
+
+                btmwrapLayout.addView(reply, 0);
+
+                sendState = Utilities.FORWARD;
+
+            }
         }
 
         buildRecycle();
@@ -139,7 +199,6 @@ public class SimpleChat extends Fragment implements MessageListCallback {
 
     }
 
-
     private void buildCanPostUI()
     {
         messageInput = fragment.findViewById(R.id.simplechat_messageInput_edittext);
@@ -147,7 +206,7 @@ public class SimpleChat extends Fragment implements MessageListCallback {
             @Override
             public void onClick(View view) {
 
-                TdApi.MessageSendOptions options = new TdApi.MessageSendOptions(true, false, new TdApi.MessageSchedulingStateSendAtDate(1) );
+                TdApi.MessageSendOptions options = new TdApi.MessageSendOptions(true, false, new TdApi.MessageSchedulingStateSendAtDate(1));
 
                 TdApi.InputMessageText textMess = new TdApi.InputMessageText();
 
@@ -155,22 +214,40 @@ public class SimpleChat extends Fragment implements MessageListCallback {
                 textC.text = messageInput.getText().toString();
                 textMess.text = textC;
                 messageInput.setText("");
-                
-                ((MainActivity)getActivity()).sendPosting(chatId, 0, options, new TdApi.ReplyMarkupRemoveKeyboard(), textMess, new Client.ResultHandler() {
-                    @Override
-                    public void onResult(TdApi.Object object) {
 
-                        //Log.d(TAG, "onResult: ");
-                    }
-                });
+                if (sendState.equals(Utilities.NEWMESS)) {
 
+                    telegramController.sendMessage(chatId, 0, options, new TdApi.ReplyMarkupRemoveKeyboard(), textMess, new Client.ResultHandler() {
+                        @Override
+                        public void onResult(TdApi.Object object) {
+
+                            //Log.d(TAG, "onResult: ");
+                        }
+                    });
+
+
+                }else if (sendState.equals(Utilities.FORWARD))
+                {
+                    //post forward
+                    telegramController.forwardMessage();
+
+                    removeReplyView();
+
+                }
+                else if (sendState.equals(Utilities.REPLY))
+                {
+                    //post reply
+                    telegramController.replyMessage();
+                    removeReplyView();
+
+                }
 
                 View v = getActivity().getCurrentFocus();
                 if (v != null) {
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
                     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
                 }
-
+                sendState = Utilities.NEWMESS;
 
             }
         };
@@ -277,7 +354,6 @@ public class SimpleChat extends Fragment implements MessageListCallback {
 
     }
 
-
     private void requestMoreData()
     {
                if (messageRecieiver == null) {
@@ -326,7 +402,7 @@ public class SimpleChat extends Fragment implements MessageListCallback {
                    prevId =  messageList.get(messageList.size()-1).id;
                }
 
-        ((MainActivity)getActivity()).getChatHistory(chatId, prevId, 5, messageRecieiver);
+        telegramController.getChatHistory(chatId, prevId, 5, messageRecieiver);
 
 
 
@@ -336,7 +412,7 @@ public class SimpleChat extends Fragment implements MessageListCallback {
     @Override
     public void messageAction(TdApi.Message message, String action) {
 
-        //new message from us or other
+        //new message from tdapi
         if (action.equals(Utilities.NEWMESS)){
 
             if  (message.sendingState != null) return;
@@ -345,12 +421,49 @@ public class SimpleChat extends Fragment implements MessageListCallback {
             recyclerView.scrollToPosition(0);
 
 
-        }
-        //we interacted with viewholder
-        else{
+        }else if(action.equals(Utilities.REPLY))
+        {
+            LinearLayout btmwrapLayout = fragment.findViewById(R.id.simpleChat_bottomwrapper_linear);
 
-            ((MainActivity)getActivity()).performMessageAction(message, action);
+            View reply = buildReplyView(message);
+
+            btmwrapLayout.addView(reply, 0);
+
+            sendState = Utilities.REPLY;
+
         }
+
+        else if(action.equals(Utilities.FORWARD))
+        {
+            controller.setMessageToForward(message);
+            Navigation.findNavController(getActivity(), R.id.nav_host_fragment).navigate(R.id.action_global_chatList);
+
+        }
+        else if (action.equals(Utilities.EDIT))
+        {
+
+        }
+
+
+        else if (action.equals(Utilities.DELETE))
+        {
+            String delete = "Delete this message?";
+
+           if (message.canBeDeletedOnlyForSelf){
+               new Delete_Dialog(delete, "", this,  message, action, 0).show(getChildFragmentManager(), TAG);
+           }
+           else if (message.canBeDeletedForAllUsers)
+           {
+               new Delete_Dialog(delete, "Delete for all users?", this, message, action, 0).show(getChildFragmentManager(), TAG);
+           }
+
+        }
+
+
+        // TODO: 6/24/2022 is this need elsewhere etc
+            //telegramController.performMessageAction(message, action);
+
+
 
 
 
@@ -359,17 +472,93 @@ public class SimpleChat extends Fragment implements MessageListCallback {
 
     }
 
+    @Override
+    public void setvalue(Object obj, String operation, int pos, int result) {
+
+
+        TdApi.Message mess = (TdApi.Message) obj;
+
+        switch (operation)
+        {
+            case Utilities.DELETE:
+
+                boolean allusers = result == 1;
+                telegramController.deleteMessage(mess.chatId, new long[] {mess.id}, allusers, null);
+
+                break;
+        }
+
+    }
 
     @Override
     public void onPause() {
         super.onPause();
-        ((MainActivity)getActivity()).cancelLiveChat();
+        telegramController.cancelLiveChat();
     }
 
 
     @Override
     public void onResume() {
         super.onResume();
-        ((MainActivity)getActivity()).setLiveChat(this, chatId);
+        telegramController.setLiveChat(this, chatId);
     }
+
+
+    private View buildReplyView(TdApi.Message message)
+    {
+        View replyLayout = View.inflate(fragment.getContext(), R.layout.reply_layout, null);
+
+        ImageView img = replyLayout.findViewById(R.id.reply_img);
+        TextView text = replyLayout.findViewById(R.id.reply_text);
+
+        switch (message.content.getConstructor() ) {
+
+            case TdApi.MessageText.CONSTRUCTOR:
+                TdApi.MessageText m = (TdApi.MessageText) message.content;
+                text.setText(m.text.text);
+                break;
+            case TdApi.MessagePhoto.CONSTRUCTOR:
+                TdApi.MessagePhoto mp = (TdApi.MessagePhoto) message.content;
+                text.setText(mp.caption.text);
+                Utilities.getMessagePhoto(mp, img, ((MainActivity) getActivity()));
+                break;
+            case TdApi.MessageAudio.CONSTRUCTOR:
+                img.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+                break;
+            case TdApi.MessageVoiceNote.CONSTRUCTOR:
+                img.setImageResource(R.drawable.ic_baseline_play_arrow_24);
+                break;
+            case TdApi.MessageVideo.CONSTRUCTOR:
+                TdApi.MessageVideo mv = (TdApi.MessageVideo) message.content;
+                text.setText(mv.caption.text);
+                Utilities.setMessageVideoThumb(mv, img, ((MainActivity) getActivity()));
+                break;
+            case TdApi.MessageVideoNote.CONSTRUCTOR:
+                TdApi.MessageVideoNote mvn = (TdApi.MessageVideoNote) message.content;
+                Utilities.setMessageVideoNoteThumb(mvn, img, ((MainActivity) getActivity()));
+                break;
+            case TdApi.MessageDocument.CONSTRUCTOR:
+                text.setText("Document");
+                break;
+            case TdApi.MessageSticker.CONSTRUCTOR:
+                text.setText("Sticker");
+                break;
+            case TdApi.MessageAnimation.CONSTRUCTOR:
+                text.setText("Animation");
+                break;
+            default:
+                text.setText("cannot display");
+                break;
+
+        }
+
+            return replyLayout;
+    }
+
+    private void removeReplyView()
+    {
+
+    }
+
+
 }

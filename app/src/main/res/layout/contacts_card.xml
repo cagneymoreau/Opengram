@@ -15,30 +15,30 @@
         android:maxHeight="100dp"
         android:paddingEnd="8dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/contacts_card_chatTitle_textView"
+        app:layout_constraintEnd_toStartOf="@id/contacts_card_name_textView"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
     <TextView
-        android:id="@+id/contacts_card_chatTitle_textView"
+        android:id="@+id/contacts_card_name_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="username"
         android:textColor="@color/text_neutral"
         android:textColorHighlight="@color/text_contrast"
         app:layout_constraintStart_toEndOf="@+id/contacts_card_avatar_imageview"
-        app:layout_constraintEnd_toStartOf="@+id/contacts_card_preview_textview"
+        app:layout_constraintEnd_toStartOf="@+id/contacts_card_lastseen_textview"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/contacts_card_preview_textview"/>
+        app:layout_constraintBottom_toTopOf="@id/contacts_card_lastseen_textview"/>
 
     <TextView
-        android:id="@+id/contacts_card_preview_textview"
+        android:id="@+id/contacts_card_lastseen_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="last seen unkown"
+        android:text="last seen unknown"
         android:textColor="@color/text_neutral"
         app:layout_constraintStart_toEndOf="@+id/contacts_card_avatar_imageview"
-        app:layout_constraintTop_toBottomOf="@+id/contacts_card_chatTitle_textView"
+        app:layout_constraintTop_toBottomOf="@+id/contacts_card_name_textView"
         app:layout_constraintBottom_toBottomOf="parent"/>
 
 

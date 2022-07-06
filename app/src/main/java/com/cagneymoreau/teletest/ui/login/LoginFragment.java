@@ -19,6 +19,7 @@ import androidx.fragment.app.Fragment;
 
 import com.cagneymoreau.teletest.MainActivity;
 import com.cagneymoreau.teletest.R;
+import com.cagneymoreau.teletest.data.TelegramController;
 
 import org.drinkless.td.libcore.telegram.Client;
 import org.drinkless.td.libcore.telegram.TdApi;
@@ -42,6 +43,7 @@ public class LoginFragment extends Fragment {
     private final static String TAG = "login_fragment";
 
     Client telegramClient;
+    TelegramController telegramController;
 
     View fragment;
     TextView titleTv, descTv;
@@ -55,10 +57,11 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragment = inflater.inflate(R.layout.login_fragment, container, false);
+        telegramController = TelegramController.getInstance(((MainActivity) getActivity()));
 
-        telegramClient = ((MainActivity) getActivity()).getTelegramClient();
+        telegramClient = telegramController.getTelegramClient();
 
-        ((MainActivity)getActivity()).setLoginFragment(this);
+        telegramController.setLoginFragment(this);
 
         buildFrag();
 
@@ -78,7 +81,7 @@ public class LoginFragment extends Fragment {
         inputEditText.setVisibility(View.INVISIBLE);
         confirmBtton.setText(R.string.confirm);
         confirmBtton.setOnClickListener(view -> {
-            changeState(((MainActivity)getActivity()).getAuthorizationState());
+            changeState(telegramController.getAuthorizationState());
         });
         extraButton.setVisibility(View.INVISIBLE);
     }
@@ -115,7 +118,7 @@ public class LoginFragment extends Fragment {
                                 return;
                             }
 
-                            telegramClient.send(new TdApi.SetAuthenticationPhoneNumber(phoneNumber, null), (MainActivity)getActivity());
+                            telegramClient.send(new TdApi.SetAuthenticationPhoneNumber(phoneNumber, null), telegramController);
                             confirmBtton.setText("processing");
                         });
                         extraButton.setVisibility(View.INVISIBLE);
@@ -134,7 +137,7 @@ public class LoginFragment extends Fragment {
 
                             String accesscode = inputEditText.getText().toString();
 
-                            ((MainActivity)getActivity()).submitLoginCode(accesscode);
+                            telegramController.submitLoginCode(accesscode);
 
 
                         });

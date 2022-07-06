@@ -14,6 +14,7 @@ import android.widget.ImageView;
 
 import com.airbnb.lottie.L;
 import com.airbnb.lottie.LottieAnimationView;
+import com.cagneymoreau.teletest.data.TelegramController;
 
 
 import org.drinkless.td.libcore.telegram.Client;
@@ -25,7 +26,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Properties;
+import java.util.concurrent.ConcurrentMap;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -49,95 +55,16 @@ public class Utilities {
     public final static String EDIT = "Edit";
     public final static String PIN = "Pin";
     public final static String DELETE = "Delete";
-    public final static String SAVE = "Save";
-    public final static String TODO = "Todo";
     public final static String LINK = "Get Link";
-
     public final static String NEWMESS = "newMessage";
 
+    public final static String GROUP = "newgroup";
+    public final static String CHANNEL = "newchann";
 
 
 
-    /**
-     *
-     * @param user
-     * @param imageView
-     * @param mainActivity
-     */
 
-    public static void getUserImage(TdApi.User user, ImageView imageView, MainActivity mainActivity)
-    {
-        String title = "error";
-        TdApi.File file = null;
-
-        if (user != null)
-        {
-            title = user.firstName;
-            if (user.profilePhoto != null)
-            {
-                file = user.profilePhoto.small;
-            }
-        }
-
-        setTdApiImageToImageView(file, 2, imageView, mainActivity, title);
-
-    }
-
-    public static void setUserAvater(TdApi.User user, ImageView imageView, MainActivity mainActivity)
-    {
-
-        //show error
-        if (user == null){
-
-            imageView.setImageBitmap(getInitials("err ??", mainActivity));
-            return;
-        }
-
-        if ( user.profilePhoto == null){
-
-            imageView.setImageBitmap(getInitials(user.firstName, mainActivity));
-
-            mainActivity.getUserProfilePhoto(user, new Client.ResultHandler() {
-                @Override
-                public void onResult(TdApi.Object object) {
-
-                    if (object.getConstructor() == TdApi.ChatPhotos.CONSTRUCTOR){
-
-                        TdApi.ChatPhotos p = (TdApi.ChatPhotos) object;
-
-                        if (p.totalCount > 0){
-                            setUserAvater(user, imageView, mainActivity);
-                        }
-                    }
-
-                }
-            });
-
-
-
-        }
-
-        //check is we can get locally
-        else if (user.profilePhoto.small.local.isDownloadingCompleted)
-        {
-            displayFile(mainActivity, imageView, new File(user.profilePhoto.small.local.path), getInitials(user.firstName, mainActivity));
-        }
-        else{
-
-            Log.e(TAG, "setUserAvater: unabe to set user photo", null);
-            imageView.setImageBitmap(getInitials(user.firstName, mainActivity));
-
-        }
-
-
-    }
-
-    public static void setUserAvater(TdApi.UserFullInfo user, ImageView imageView, MainActivity mainActivity)
-    {
-
-
-
-    }
+    //region ---------------------  set image to view
 
 
     private static void displayFile(MainActivity mainActivity, ImageView imageView, File f, Bitmap b)
@@ -164,82 +91,6 @@ public class Utilities {
     }
 
 
-
-    /**
-     * This uses the cached directory. Files will be automi
-     * @param name
-     * @param suffix
-     * @param context
-     * @return
-     */
-    public static File getFilePath(String name, String suffix, Context context)
-    {
-        File file = new File("");
-
-
-
-        //Log.i(TAG, "getFilePath: " + name + NAMEFORFILE);
-        String fileName = Uri.parse(name + " -").getLastPathSegment();
-
-        try {
-
-            file = File.createTempFile(fileName, suffix, context.getCacheDir());
-        } catch (IOException e) {
-            Log.e(TAG, "getFilePath: failed", e);
-            //Crashlytics.log(TAG + " " +  e);
-            //Reporting.report_Event(mContext, Reporting.ERROR, "reportgenerator:618", e.toString());
-        }
-
-        return file;
-
-    }
-
-
-
-    public static void setChatAvater(TdApi.Chat chat, ImageView avatar_imgView, MainActivity mainActivity)
-    {
-        String title = chat.title;
-        TdApi.File file = null;
-        if (chat.photo != null) {
-           file = chat.photo.small;
-        }
-
-        setTdApiImageToImageView(file, 2, avatar_imgView, mainActivity, title);
-
-    }
-
-
-    public static void getMessagePhoto(TdApi.MessagePhoto photo, ImageView imageView, MainActivity mainActivity)
-    {
-         TdApi.File file = photo.photo.sizes[0].photo;
-
-         setTdApiImageToImageView(file, 0, imageView, mainActivity, "error");
-
-    }
-
-
-    public static void getSticker(TdApi.MessageSticker sticker, ImageView imageView, MainActivity mainActivity)
-    {
-            TdApi.File file = sticker.sticker.sticker;
-            
-            if (sticker.sticker.isAnimated){
-                Log.d(TAG, "getSticker: ");
-            }
-
-        setTdApiImageToImageView(file, 0, imageView, mainActivity, "error");
-
-    }
-
-
-    public static void getAnimation(TdApi.MessageAnimation animation, ImageView imageView, MainActivity mainActivity)
-    {
-        TdApi.File file = animation.animation.animation;
-
-        setTdApiImageToImageView(file, 0, imageView, mainActivity, "error");
-
-    }
-
-
     private static void setTdApiImageToImageView(TdApi.File file,int sampleSize, ImageView avatar_imgView, MainActivity mainActivity, String backupText)
     {
 
@@ -248,7 +99,7 @@ public class Utilities {
             if (!file.local.path.isEmpty()) {
                 String path = file.local.path;
 
-              pathToImageView(path, mainActivity, avatar_imgView, sampleSize);
+                pathToImageView(path, mainActivity, avatar_imgView, sampleSize);
 
             }else{
 
@@ -274,7 +125,8 @@ public class Utilities {
                 };
 
                 int id = file.id;
-                mainActivity.downloadFile(id, 1, handler);
+                TelegramController telegramController = TelegramController.getInstance(mainActivity);
+                telegramController.downloadFile(id, 1, handler);
 
                 //meanwhile
                 Bitmap b = getInitials(backupText, mainActivity);
@@ -291,7 +143,6 @@ public class Utilities {
         }
 
     }
-
 
     private static void pathToImageView(String path, MainActivity mainActivity, ImageView imageView, int downsample)
     {
@@ -339,6 +190,238 @@ public class Utilities {
 
 
 
+    public static void setChatAvater(TdApi.Chat chat, ImageView avatar_imgView, MainActivity mainActivity)
+    {
+        String title = chat.title;
+        TdApi.File file = null;
+        if (chat.photo != null) {
+           file = chat.photo.small;
+        }
+
+        setTdApiImageToImageView(file, 2, avatar_imgView, mainActivity, title);
+
+    }
+
+    public static void setUserAvater(TdApi.User user, ImageView imageView, MainActivity mainActivity)
+    {
+
+        String title = user.firstName;
+        TdApi.File file = null;
+        if (user.profilePhoto != null) {
+            file = user.profilePhoto.small;
+        }
+
+        setTdApiImageToImageView(file, 2, imageView, mainActivity, title);
+
+
+
+        /*
+
+        //show error
+        if (user == null){
+
+            imageView.setImageBitmap(getInitials("err ??", mainActivity));
+            return;
+        }
+
+        if ( user.profilePhoto == null){
+
+            imageView.setImageBitmap(getInitials(user.firstName, mainActivity));
+
+
+            TelegramController telegramController = TelegramController.getInstance(mainActivity);
+            telegramController.getUserProfilePhoto(user, new Client.ResultHandler() {
+                @Override
+                public void onResult(TdApi.Object object) {
+
+                    if (object.getConstructor() == TdApi.ChatPhotos.CONSTRUCTOR){
+
+                        TdApi.ChatPhotos p = (TdApi.ChatPhotos) object;
+
+                        if (p.totalCount > 0){
+                            setUserAvater(user, imageView, mainActivity);
+                        }
+                    }
+
+                }
+            });
+
+
+
+        }
+
+        //check is we can get locally
+        else if (user.profilePhoto.small.local.isDownloadingCompleted)
+        {
+            displayFile(mainActivity, imageView, new File(user.profilePhoto.small.local.path), getInitials(user.firstName, mainActivity));
+        }
+        else{
+
+            Log.e(TAG, "setUserAvater: unabe to set user photo", null);
+            imageView.setImageBitmap(getInitials(user.firstName, mainActivity));
+
+        }
+
+
+    }
+
+    public static void setUserAvater(TdApi.UserFullInfo user, ImageView imageView, MainActivity mainActivity)
+    {
+
+
+         */
+
+
+    }
+
+
+    public static void getUserImage(TdApi.User user, ImageView imageView, MainActivity mainActivity)
+    {
+        String title = "error";
+        TdApi.File file = null;
+
+        if (user != null)
+        {
+            title = user.firstName;
+            if (user.profilePhoto != null)
+            {
+                file = user.profilePhoto.small;
+            }
+        }
+
+        setTdApiImageToImageView(file, 2, imageView, mainActivity, title);
+
+    }
+
+
+
+    //endregion
+
+    //region ---------------------------  set message media to view
+
+
+    public static void getMessagePhoto(TdApi.MessagePhoto photo, ImageView imageView, MainActivity mainActivity)
+    {
+         TdApi.File file = photo.photo.sizes[0].photo;
+
+         setTdApiImageToImageView(file, 0, imageView, mainActivity, "error");
+
+    }
+
+    public static void setMessageVideoThumb(TdApi.MessageVideo video, ImageView imageView, MainActivity mainActivity)
+    {
+        if (video.video.thumbnail == null) return;
+
+        TdApi.File file = video.video.thumbnail.file;
+
+        setTdApiImageToImageView(file, 0, imageView, mainActivity, "error");
+
+    }
+
+    public static void setMessageVideoNoteThumb(TdApi.MessageVideoNote video, ImageView imageView, MainActivity mainActivity)
+    {
+        if (video.videoNote.thumbnail == null) return;
+
+        TdApi.File file = video.videoNote.thumbnail.file;
+
+        setTdApiImageToImageView(file, 0, imageView, mainActivity, "error");
+
+    }
+
+    public static void getSticker(TdApi.MessageSticker sticker, ImageView imageView, MainActivity mainActivity)
+    {
+            TdApi.File file = sticker.sticker.sticker;
+            
+            if (sticker.sticker.isAnimated){
+                Log.d(TAG, "getSticker: ");
+            }
+
+        setTdApiImageToImageView(file, 0, imageView, mainActivity, "error");
+
+    }
+
+    public static void getAnimation(TdApi.MessageAnimation animation, ImageView imageView, MainActivity mainActivity)
+    {
+        TdApi.File file = animation.animation.animation;
+
+        setTdApiImageToImageView(file, 0, imageView, mainActivity, "error");
+
+    }
+
+    public static void setWebViewImage(TdApi.WebPage webPage, ImageView imageView, MainActivity mainActivity)
+    {
+
+        String title = webPage.title;
+        TdApi.File file = null;
+        if (webPage.photo != null) {
+            file = webPage.photo.sizes[0].photo;
+        }
+
+        setTdApiImageToImageView(file, 2, imageView, mainActivity, title);
+
+
+
+    }
+
+
+    //endregion
+
+
+    //region -------------  basics
+
+
+
+
+    public static ArrayList<TdApi.User> filter(String query, ConcurrentMap<Long, TdApi.User> users, boolean sort)
+    {
+        if (query.isEmpty()) return new ArrayList<>();
+
+        query = query.toLowerCase();
+
+        Collection<TdApi.User> val = users.values();
+        ArrayList<TdApi.User> usersList = new ArrayList<>(val);
+
+        ArrayList<TdApi.User> matchingchats = new ArrayList<>();
+
+        for (int i = 0; i < usersList.size(); i++) {
+
+            String title = usersList.get(i).firstName.toLowerCase();
+
+            if (title.contains(query)) matchingchats.add(usersList.get(i));
+
+        }
+
+        if (sort){
+
+            Collections.sort(matchingchats,new UserComparator());
+        }
+
+        return matchingchats;
+
+    }
+
+    public static class UserComparator implements Comparator<TdApi.User> {
+
+        // override the compare() method
+        public int compare(TdApi.User u1, TdApi.User u2)
+        {
+            int user1 = 0, user2 = 0;
+
+            if (u1.isMutualContact) user1 += 3;
+            if (u2.isMutualContact) user2 += 3;
+
+            if (u1.status.getConstructor() == TdApi.UserStatusOnline.CONSTRUCTOR) user1 += 3;
+            else if (u1.status.getConstructor() == TdApi.UserStatusRecently.CONSTRUCTOR) user1 += 2;
+            else if (u1.status.getConstructor() == TdApi.UserStatusLastWeek.CONSTRUCTOR) user1 += 1;
+
+            if (u2.status.getConstructor() == TdApi.UserStatusOnline.CONSTRUCTOR) user2 += 3;
+            else if (u2.status.getConstructor() == TdApi.UserStatusRecently.CONSTRUCTOR) user2 += 2;
+            else if (u2.status.getConstructor() == TdApi.UserStatusLastWeek.CONSTRUCTOR) user2 += 1;
+
+            return Integer.compare(user2, user1);
+
+        }
+    }
 
 
     public static Bitmap getInitials(String title, Activity a){
@@ -387,5 +470,67 @@ public class Utilities {
         is.close();
         return string.toString();
     }
+
+    public static String getStatusHumanReadable(TdApi.UserStatus stat)
+    {
+
+        String status = "unknown";
+
+        switch (stat.getConstructor())
+        {
+            case TdApi.UserStatusOnline.CONSTRUCTOR:
+                status = "Online";
+                break;
+
+            case TdApi.UserStatusRecently.CONSTRUCTOR:
+                status = "Last seen recently";
+                break;
+
+            case TdApi.UserStatusLastWeek.CONSTRUCTOR:
+                status = "Last seen within a week";
+                break;
+
+            case TdApi.UserStatusLastMonth.CONSTRUCTOR:
+                status = "Last seen within a month";
+                break;
+
+            default:
+                status = "Last seen a long time ago";
+                break;
+
+        }
+
+        return status;
+    }
+
+
+    public static File getFilePath(String name, String suffix, Context context)
+    {
+        File file = new File("");
+
+
+
+        //Log.i(TAG, "getFilePath: " + name + NAMEFORFILE);
+        String fileName = Uri.parse(name + " -").getLastPathSegment();
+
+        try {
+
+            file = File.createTempFile(fileName, suffix, context.getCacheDir());
+        } catch (IOException e) {
+            Log.e(TAG, "getFilePath: failed", e);
+            //Crashlytics.log(TAG + " " +  e);
+            //Reporting.report_Event(mContext, Reporting.ERROR, "reportgenerator:618", e.toString());
+        }
+
+        return file;
+
+    }
+
+
+
+    //endregion
+
+
+
 
 }
